@@ -2,6 +2,9 @@
 #include "cPaddle.cpp"
 #include <time.h>
 #include <conio.h>
+#include <thread>
+#include <mutex>
+#include <condition_variable>
 
 class cGameManger
 {
@@ -13,6 +16,7 @@ private:
 	cBall* ball;
 	cPaddle* player1;
 	cPaddle* player2;
+
 public:
 	cGameManger(int w, int h)
 	{
@@ -41,6 +45,7 @@ public:
 		player1->Reset();
 		player2->Reset();
 	}
+
 	void Draw()
 	{
 		system("cls");
@@ -97,40 +102,6 @@ public:
 
 		cout << "Score 1: " << score1 << endl << "Score 2: " << score2 << endl;
 	}
-	void Input()
-	{
-		ball->Move();
-
-		int ballx = ball->getX();
-		int bally = ball->getY();
-		int player1x = player1->getX();
-		int player2x = player2->getX();
-		int player1y = player1->getY();
-		int player2y = player2->getY();
-
-		if (_kbhit())
-		{
-			char current = _getch();
-			if (current == up1)
-				if (player1y > 0)
-					player1->moveUp();
-			if (current == up2)
-				if (player2y > 0)
-					player2->moveUp();
-			if (current == down1)
-				if (player1y + 4 < height)
-					player1->moveDown();
-			if (current == down2)
-				if (player2y + 4 < height)
-					player2->moveDown();
-
-			if (ball->getDirection() == STOP)
-				ball->randomDirection();
-
-			if (current == 'q')
-				quit = true;
-		}
-	}
 	void Logic()
 	{
 		int ballx = ball->getX();
@@ -159,19 +130,94 @@ public:
 		if (bally == 0)
 			ball->changeDirection(ball->getDirection() == UPRIGHT ? DOWNRIGHT : DOWNLEFT);
 		//right wall
-		if (ballx == width - 1)
+		if (ballx == width - 2)
 			ScoreUp(player1);
 		//left wall
-		if (ballx == 0)
+		if (ballx == 1)
 			ScoreUp(player2);
 	}
 	void Run()
 	{
-		while (!quit)
-		{
+		std::mutex mut;
+		std::condition_variable cvPlayer, cvBall;
+
+		std::thread threadPlayer1(&cGameManger::player1Function, this, &mut, &cvPlayer, &cvBall);
+		std::thread threadPlayer2(&cGameManger::player2Function, this, &mut, &cvPlayer, &cvBall);
+		std::thread threadBall(&cGameManger::ballFunction, this, &mut, &cvPlayer, &cvBall);
+
+		threadBall.join();
+		threadPlayer1.join();
+		threadPlayer2.join();
+	}
+
+	void player1Function(std::mutex* mut, std::condition_variable* cvPlayer, std::condition_variable* cvBall) {
+		std::unique_lock<std::mutex> lock(*mut);
+		while (quit == false) {
+			(*cvBall).notify_one();
+			(*cvPlayer).wait(lock);
+			if (_kbhit()) {
+				
+				char current = _getch();
+				if (current == up1)
+					if (player1->getY() > 0) {
+						player1->moveUp();
+						Draw();
+					}
+				if (current == down1)
+					if (player1->getY() + 4 < height) {
+						player1->moveDown();
+						Draw();
+					}
+				
+				if (current == 'q')
+					quit = true;
+				
+			}
+			
+		}
+	}
+
+	void player2Function(std::mutex* mut, std::condition_variable* cvPlayer, std::condition_variable* cvBall) {
+		std::unique_lock<std::mutex> lock(*mut);
+		while (quit == false) {
+			(*cvBall).notify_one();
+			(*cvPlayer).wait(lock);
+			if (_kbhit()) {
+				
+				char current = _getch();
+				if (current == up2)
+					if (player2->getY() > 0) {
+						player2->moveUp();
+						Draw();
+					}
+				if (current == down2)
+					if (player2->getY() + 4 < height) {
+						player2->moveDown();
+						Draw();
+					}
+				
+				if (current == 'q')
+					quit = true;
+				
+			}
+			
+		}
+	}
+
+	void ballFunction(std::mutex* mut, std::condition_variable* cvPlayer, std::condition_variable* cvBall) {
+		std::unique_lock<std::mutex> lock(*mut);
+		std::cout << "test1";
+		while (quit == false) {
+			(*cvBall).wait(lock);
+			std::cout << "test2";
+			ball->Move();
 			Draw();
-			Input();
+			(*cvPlayer).notify_all();
+			std::cout << "test3";
+			if (ball->getDirection() == STOP)
+				ball->randomDirection();
 			Logic();
+			std::this_thread::sleep_for(0.5s);
 		}
 	}
 };
