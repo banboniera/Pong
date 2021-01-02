@@ -27,5 +27,11 @@
     <ClCompile Include="cGameManger.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="sServer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="sClient.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

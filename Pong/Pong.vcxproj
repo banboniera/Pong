@@ -142,6 +142,8 @@
     <ClCompile Include="cGameManger.cpp" />
     <ClCompile Include="cPaddle.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="sClient.cpp" />
+    <ClCompile Include="sServer.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
