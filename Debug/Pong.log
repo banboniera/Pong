@@ -1,0 +1,5 @@
+﻿  main.cpp
+D:\Stol\5 semestr\POS\semestralka\Pong\Pong\cGameManger.cpp(24,13): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
+  LINK : D:\Stol\5 semestr\POS\semestralka\Pong\Debug\Pong.exe not found or not built by the last incremental link; performing full link
+sClient.obj : error LNK2005: "int __cdecl client(int,char * *)" (?client@@YAHHPAPAD@Z) already defined in main.obj
+D:\Stol\5 semestr\POS\semestralka\Pong\Debug\Pong.exe : fatal error LNK1169: one or more multiply defined symbols found
