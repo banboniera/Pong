@@ -2,7 +2,6 @@
 #include "cPaddle.cpp"
 #include <time.h>
 #include <curses.h>
-#include <pthread.h>
 #include <thread>
 #include <mutex>
 #include <condition_variable>
@@ -236,8 +235,6 @@ public:
 
             if (serverChar == 'q')
                 quit = true;*/
-
-
         }
     }
 
@@ -287,14 +284,14 @@ public:
         Draw();
 
         std::thread threadPlayer1(&cGameManager::player1Function, this, &mut, &cvPlayer, &cvBall);
-        std::thread threadPlayer2(&cGameManager::player2Function, this, &mut, &cvPlayer, &cvBall);
+        //std::thread threadPlayer2(&cGameManager::player2Function, this, &mut, &cvPlayer, &cvBall);
         std::thread threadBall(&cGameManager::ballFunction, this, &mut, &cvPlayer, &cvBall);
 
 
 
         threadBall.join();
         threadPlayer1.join();
-        threadPlayer2.join();
+        //threadPlayer2.join();
 
     }
 };
