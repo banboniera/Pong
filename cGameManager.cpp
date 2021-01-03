@@ -201,14 +201,12 @@ public:
             ScoreUp(player2);
     }
 
-     void player1Function(std::mutex* mut, std::condition_variable* cvPlayer, std::condition_variable* cvBall) {
-         std::cout << "test3";
+    void player1Function(std::mutex* mut, std::condition_variable* cvPlayer, std::condition_variable* cvBall) {
         while (quit == false) {
             //(*cvBall).notify_one();
             //(*cvPlayer).wait(lock);
             //mut->lock();
             char current = mygetch();
-            std::cout << "test4";
                 if (current == up1)
                     if (player1->getY() > 0) {
                         player1->moveUp();
@@ -223,7 +221,6 @@ public:
                 if (current == 'q')
                     quit = true;
                 //mut->unlock();
-            std::cout << "test5";
             /*
             if (serverChar == up1)
                 if (player1->getY() > 0) {
@@ -242,12 +239,11 @@ public:
     }
 
     void player2Function(std::mutex* mut, std::condition_variable* cvPlayer, std::condition_variable* cvBall) {
-        std::unique_lock<std::mutex> lock(*mut);
+        //std::unique_lock<std::mutex> lock(*mut);
         while (quit == false) {
-            (*cvBall).notify_one();
-            (*cvPlayer).wait(lock);
-            char current = 'a';
-            cin >> current;
+            //(*cvBall).notify_one();
+            //(*cvPlayer).wait(lock);
+            char current = mygetch();
                 if (current == up2)
                     if (player2->getY() > 0) {
                         player2->moveUp();
@@ -260,35 +256,34 @@ public:
                     }
 
                 if (current == 'q')
-                    quit = true;        }
+                    quit = true;
+
+
+
+        }
     }
 
     void ballFunction(std::mutex* mut, std::condition_variable* cvPlayer, std::condition_variable* cvBall) {
-        std::cout << "test7";
-        std::unique_lock<std::mutex> lock(*mut);
+        //std::unique_lock<std::mutex> lock(*mut);
         while (quit == false) {
             //(*cvPlayer).notify_all();
             //mut->lock();
-            std::cout << "test8";
             ball->Move();
             Draw();
-            std::cout << "test9";
             //mut->unlock();
             //(*cvBall).wait(lock);
             if (ball->getDirection() == STOP)
                 ball->randomDirection();
             Logic();
-            std::cout << "test10";
-            //std::this_thread::sleep_for(0.05s);
+            std::this_thread::sleep_for(0.5s);
         }
     }
 
     void Run()
     {
         Draw();
-        std::cout << "test1";
+
         std::thread threadPlayer1(&cGameManager::player1Function, this, &mut, &cvPlayer, &cvBall);
-        std::cout << "test2";
         //std::thread threadPlayer2(&cGameManager::player2Function, this, &mut, &cvPlayer, &cvBall);
         std::thread threadBall(&cGameManager::ballFunction, this, &mut, &cvPlayer, &cvBall);
 
