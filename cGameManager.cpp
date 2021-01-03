@@ -2,11 +2,11 @@
 #include "cPaddle.cpp"
 #include <time.h>
 #include <curses.h>
-#include <pthread.h>
 #include <thread>
 #include <mutex>
 #include <condition_variable>
 #include <termios.h>
+#include <unistd.h>
 
 class cGameManager
 {
@@ -21,18 +21,6 @@ private:
     std::mutex mut;
     std::condition_variable cvBall;
     std::condition_variable cvPlayer;
-
-    /*typedef struct playerData {
-        pthread_mutex_t * mut;
-        pthread_cond_t * condBall;
-        pthread_cond_t * condPlayer;
-    }PLAYER;
-
-    typedef struct ballData{
-        pthread_mutex_t * mut;
-        pthread_cond_t * condBall;
-        pthread_cond_t * condPlayer;
-    }BALL;*/
 
 public:
     cGameManager(int w, int h)
@@ -250,12 +238,10 @@ public:
 
             if (serverChar == 'q')
                 quit = true;*/
-
-
         }
     }
 
-    /*void player2Function(std::mutex* mut, std::condition_variable* cvPlayer, std::condition_variable* cvBall) {
+    void player2Function(std::mutex* mut, std::condition_variable* cvPlayer, std::condition_variable* cvBall) {
         std::unique_lock<std::mutex> lock(*mut);
         while (quit == false) {
             (*cvBall).notify_one();
@@ -274,12 +260,8 @@ public:
                     }
 
                 if (current == 'q')
-                    quit = true;
-
-
-
-        }
-    }*/
+                    quit = true;        }
+    }
 
     void ballFunction(std::mutex* mut, std::condition_variable* cvPlayer, std::condition_variable* cvBall) {
         std::cout << "test7";
@@ -304,24 +286,6 @@ public:
     void Run()
     {
         Draw();
-
-        /*pthread_t threadPlayer1;
-        pthread_t threadPlayer2;
-        pthread_t threadBall;
-
-        pthread_mutex_t  mut;
-        pthread_cond_t condBall, condPlayer;
-
-        pthread_mutex_init(&mut, NULL);
-        pthread_cond_init(&condBall, NULL);
-        pthread_cond_init(&condPlayer, NULL);
-
-        PLAYER dataPlayer1 = {&mut, &condBall, &condPlayer};
-        PLAYER dataPlayer2 = {&mut, &condBall, &condPlayer};
-        BALL dataBall = {&mut, &condBall, &condPlayer};
-
-        pthread_create(&threadPlayer1,NULL,&cGameManager::player1Function,&dataPlayer1);*/
-
         std::cout << "test1";
         std::thread threadPlayer1(&cGameManager::player1Function, this, &mut, &cvPlayer, &cvBall);
         std::cout << "test2";
