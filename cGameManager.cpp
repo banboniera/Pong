@@ -263,17 +263,14 @@ public:
         while (quit == false) {
             //(*cvPlayer).notify_all();
             //mut->lock();
-            std::cout << "test8";
             ball->Move();
             Draw();
-            std::cout << "test9";
             //mut->unlock();
             //(*cvBall).wait(lock);
             if (ball->getDirection() == STOP)
                 ball->randomDirection();
             Logic();
-            std::cout << "test10";
-            //std::this_thread::sleep_for(0.05s);
+            std::this_thread::sleep_for(0.5s);
         }
     }
 
