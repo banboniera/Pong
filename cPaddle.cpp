@@ -22,6 +22,8 @@ public:
     inline void Reset() { x = originalX; y = originalY; }
     inline int getX() { return x; }
     inline int getY() { return y; }
+    inline void setX(int x) { this->x = x; }
+    inline void setY(int y) { this->y = y; }
     inline void moveUp() { y--; }
     inline void moveDown() { y++; }
     friend ostream& operator<<(ostream& o, cPaddle c)

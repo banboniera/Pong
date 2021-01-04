@@ -33,6 +33,8 @@ public:
     }
     inline int getX() { return x; }
     inline int getY() { return y; }
+    inline void setX(int x) { this->x = x; }
+    inline void setY(int y) { this->y = y; }
     inline eDir getDirection() { return direction; }
     void Move()
     {

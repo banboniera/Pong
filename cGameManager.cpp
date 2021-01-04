@@ -8,35 +8,37 @@
 #include <termios.h>
 #include <unistd.h>
 
-class cGameManager
-{
+class cGameManager {
 private:
     int width, height;
     int score1, score2;
-    char up1, down1, up2, down2;
+    char up1, down1, up2, down2, current;
     bool quit;
-    cBall* ball;
-    cPaddle* player1;
-    cPaddle* player2;
+    cBall *ball;
+    cPaddle *player1;
+    cPaddle *player2;
     std::mutex mut;
     std::condition_variable cvBall;
     std::condition_variable cvPlayer;
 
 public:
-    cGameManager(int w, int h)
-    {
+    cGameManager(int w, int h) {
         srand(time(NULL));
         quit = false;
-        up1 = 'w'; up2 = 'i';
-        down1 = 's'; down2 = 'k';
+        up1 = 'w';
+        up2 = 'i';
+        down1 = 's';
+        down2 = 'k';
         score1 = score2 = 0;
-        width = w; height = h;
+        width = w;
+        height = h;
+        current = ' ';
         ball = new cBall(w / 2, h / 2);
         player1 = new cPaddle(1, h / 2 - 3);
         player2 = new cPaddle(w - 2, h / 2 - 3);
     }
-    ~cGameManager()
-    {
+
+    ~cGameManager() {
         delete ball, player1, player2;
     }
 
@@ -56,16 +58,15 @@ public:
         if (tcsetattr(0, TCSANOW, &old) < 0)
             perror("tcsetattr ICANON");
         if (read(0, &buf, 1) < 0)
-            perror ("read()");
+            perror("read()");
         old.c_lflag |= ICANON;
         old.c_lflag |= ECHO;
         if (tcsetattr(0, TCSADRAIN, &old) < 0)
-            perror ("tcsetattr ~ICANON");
+            perror("tcsetattr ~ICANON");
         return (buf);
     }
 
-    void ScoreUp(cPaddle* player)
-    {
+    void ScoreUp(cPaddle *player) {
         if (player == player1)
             score1++;
         else if (player == player2)
@@ -75,17 +76,16 @@ public:
         player1->Reset();
         player2->Reset();
     }
-    void Draw()
-    {
+
+    void Draw() {
         system("clear");
+
         for (int i = 0; i < width + 2; i++)
             cout << "\xB2";
         cout << endl;
 
-        for (int i = 0; i < height; i++)
-        {
-            for (int j = 0; j < width; j++)
-            {
+        for (int i = 0; i < height; i++) {
+            for (int j = 0; j < width; j++) {
                 int ballx = ball->getX();
                 int bally = ball->getY();
                 int player1x = player1->getX();
@@ -95,21 +95,18 @@ public:
 
                 if (j == 0)
                     cout << "\xB2";
-
                 if (ballx == j && bally == i)
                     cout << "O"; //ball
                 else if (player1x == j && player1y == i)
                     cout << "\xDB"; //player1
                 else if (player2x == j && player2y == i)
                     cout << "\xDB"; //player2
-
                 else if (player1x == j && player1y + 1 == i)
                     cout << "\xDB"; //player1
                 else if (player1x == j && player1y + 2 == i)
                     cout << "\xDB"; //player1
                 else if (player1x == j && player1y + 3 == i)
                     cout << "\xDB"; //player1
-
                 else if (player2x == j && player2y + 1 == i)
                     cout << "\xDB"; //player1
                 else if (player2x == j && player2y + 2 == i)
@@ -118,7 +115,6 @@ public:
                     cout << "\xDB"; //player1
                 else
                     cout << " ";
-
                 if (j == width - 1)
                     cout << "\xB2";
             }
@@ -131,43 +127,41 @@ public:
 
         cout << "Score 1: " << score1 << endl << "Score 2: " << score2 << endl;
     }
-    void Input()
-    {
-        int ballx = ball->getX();
-        int bally = ball->getY();
-        int player1x = player1->getX();
-        int player2x = player2->getX();
+
+    void Input() {
         int player1y = player1->getY();
         int player2y = player2->getY();
+        current = mygetch();
 
-            char current = 'a';
-            current = mygetch();
-            if (current == up1)
-                if (player1y > 0) {
-                    player1->moveUp();
-                    Draw();
-                }
-            if (current == up2)
-                if (player2y > 0) {
-                    player2->moveUp();
-                    Draw();
-                }
-            if (current == down1)
-                if (player1y + 4 < height) {
-                    player1->moveDown();
-                    Draw();
-                }
-            if (current == down2)
-                if (player2y + 4 < height){
-                    player2->moveDown();
-                    Draw();
-                }
+        if (current == up1)
+            if (player1y > 0) {
+                player1->moveUp();
+                Draw();
+            }
 
-            if (current == 'q')
-                quit = true;
+        if (current == up2)
+            if (player2y > 0) {
+                player2->moveUp();
+                Draw();
+            }
+
+        if (current == down1)
+            if (player1y + 4 < height) {
+                player1->moveDown();
+                Draw();
+            }
+
+        if (current == down2)
+            if (player2y + 4 < height) {
+                player2->moveDown();
+                Draw();
+            }
+
+        if (current == 'q')
+            quit = true;
     }
-    void Logic()
-    {
+
+    void Logic() {
         int ballx = ball->getX();
         int bally = ball->getY();
         int player1x = player1->getX();
@@ -179,13 +173,13 @@ public:
         for (int i = 0; i < 4; i++)
             if (ballx == player1x + 1)
                 if (bally == player1y + i)
-                    ball->changeDirection((eDir)((rand() % 3) + 4));
+                    ball->changeDirection((eDir) ((rand() % 3) + 4));
 
         //right paddle
         for (int i = 0; i < 4; i++)
             if (ballx == player2x - 1)
                 if (bally == player2y + i)
-                    ball->changeDirection((eDir)((rand() % 3) + 1));
+                    ball->changeDirection((eDir) ((rand() % 3) + 1));
 
         //bottom wall
         if (bally == height - 1)
@@ -201,75 +195,89 @@ public:
             ScoreUp(player2);
     }
 
-    void player1Function(std::mutex* mut, std::condition_variable* cvPlayer, std::condition_variable* cvBall) {
+    void player1SetPosition(int player1Y, int ballX, int ballY, int score1, int score2) {
+        this->player1->setY(player1Y);
+        this->ball->setX(ballX);
+        this->ball->setY(ballY);
+        this->score1 = score1;
+        this->score2 = score2;
+        Draw();
+    }
+
+    void player2SetPosition(int posY) {
+        this->player2->setY(posY);
+        Draw();
+    }
+
+    void player1Function(std::mutex *mut, std::condition_variable *cvPlayer, std::condition_variable *cvBall) {
+        //Draw();
         while (quit == false) {
             //(*cvBall).notify_one();
             //(*cvPlayer).wait(lock);
             //mut->lock();
             char current = mygetch();
-                if (current == up1)
-                    if (player1->getY() > 0) {
-                        player1->moveUp();
-                        Draw();
-                    }
-                if (current == down1)
-                    if (player1->getY() + 4 < height) {
-                        player1->moveDown();
-                        Draw();
-                    }
-
-                if (current == 'q')
-                    quit = true;
-                //mut->unlock();
-            /*
-            if (serverChar == up1)
+            if (current == up1)
                 if (player1->getY() > 0) {
                     player1->moveUp();
-                    Draw();
+                    //Draw();
                 }
-            if (serverChar == down1)
+            if (current == down1)
                 if (player1->getY() + 4 < height) {
                     player1->moveDown();
-                    Draw();
+                    //Draw();
                 }
+            if (current == 'q')
+                quit = true;
 
-            if (serverChar == 'q')
-                quit = true;*/
+            //mut->unlock();
         }
     }
 
-    void player2Function(std::mutex* mut, std::condition_variable* cvPlayer, std::condition_variable* cvBall) {
+    void player1GetParams(char *buffer) {
+        buffer[0] = player1->getY();
+        buffer[1] = ball->getX();
+        buffer[2] = ball->getY();
+        buffer[3] = score1;
+        buffer[4] = score2;
+    }
+
+    void player2GetParams(char *buffer) {
+        buffer[0] = player2->getY();
+    }
+
+    void player2Function(/*std::mutex *mut, std::condition_variable *cvPlayer, std::condition_variable *cvBall*/) {
+        //Draw();
         //std::unique_lock<std::mutex> lock(*mut);
         while (quit == false) {
             //(*cvBall).notify_one();
             //(*cvPlayer).wait(lock);
             char current = mygetch();
-                if (current == up2)
-                    if (player2->getY() > 0) {
-                        player2->moveUp();
-                        Draw();
-                    }
-                if (current == down2)
-                    if (player2->getY() + 4 < height) {
-                        player2->moveDown();
-                        Draw();
-                    }
-
-                if (current == 'q')
-                    quit = true;
-
-
-
+            if (current == up2)
+                if (player2->getY() > 0) {
+                    player2->moveUp();
+                    //Draw();
+                }
+            if (current == down2)
+                if (player2->getY() + 4 < height) {
+                    player2->moveDown();
+                    //Draw();
+                }
+            if (current == 'q')
+                quit = true;
         }
     }
 
-    void ballFunction(std::mutex* mut, std::condition_variable* cvPlayer, std::condition_variable* cvBall) {
-        //std::unique_lock<std::mutex> lock(*mut);
+    bool getQuit() {
+        return this->quit;
+    }
+
+    void ballFunction(std::mutex *mut, std::condition_variable *cvPlayer, std::condition_variable *cvBall) {
+        std::unique_lock<std::mutex> lock(*mut);
         while (quit == false) {
             //(*cvPlayer).notify_all();
             //mut->lock();
             ball->Move();
-            Draw();
+            //Draw();
             //mut->unlock();
             //(*cvBall).wait(lock);
             if (ball->getDirection() == STOP)
@@ -279,19 +287,16 @@ public:
         }
     }
 
-    void Run()
-    {
-        Draw();
+    void setSize(int height, int width) {
+        this->height = height;
+        this->width = width;
+    }
 
+    void Run() {
         std::thread threadPlayer1(&cGameManager::player1Function, this, &mut, &cvPlayer, &cvBall);
-        //std::thread threadPlayer2(&cGameManager::player2Function, this, &mut, &cvPlayer, &cvBall);
         std::thread threadBall(&cGameManager::ballFunction, this, &mut, &cvPlayer, &cvBall);
 
-
-
-        threadBall.join();
         threadPlayer1.join();
-        //threadPlayer2.join();
-
+        threadBall.join();
     }
 };

@@ -1,21 +1,20 @@
 #include <sys/types.h>
 #include "server.cpp"
-#include "klient.cpp"
+#include "client.cpp"
 
-int main(int argc, char *argv[]){
-    int height = 40, wigth = 20;
-    std::cout << "test" << "\n";
-    char X;
-    std::cin >> X;
-    if (X == 'c') {
-        std::cout << "klient test" << "\n";
-        klient(argc, argv);
-    }
-    if (X == 'h') {
-        std::cout << "server test" << "\n";
-        server(argc, argv);
-    } else std::cout << "ZLE";
-    /*cGameManager c(40, 20);
-    c.Run();*/
-    return 0;
+int main(int argc, char *argv[]) {
+    int a = 1;
+    char input;
+    do {
+        std::cout << "Choose server (s) or client (c) or quit game (q)" << "\n";
+        std::cin >> input;
+        if (input == 'c') {
+            client(argc, argv);
+            a = 0;
+        } else if (input == 's') {
+            server(argc, argv);
+            a = 0;
+        }else if (input == 'q')
+            a = 0;
+    } while (a > 0);
 }
