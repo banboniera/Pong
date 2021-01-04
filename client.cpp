@@ -10,7 +10,7 @@
 #include <unistd.h>
 #include <termios.h>
 
-class klient {
+class client {
 private:
     int sockfd, n, width, height;
     struct sockaddr_in serv_addr;
@@ -72,7 +72,7 @@ public:
         return;
     }
 
-    klient(int argc, char *argv[]) {
+    client(int argc, char *argv[]) {
 
         std::cout << "1" << "\n";
         if (argc < 3) {
@@ -115,7 +115,7 @@ public:
         }
         std::cout << "8" << "\n";
         //std::thread threadRead(&klient::writeServer, this);
-        std::thread threadGame(&klient::start, this, (int)buffer2[0], (int)buffer2[1]);
+        std::thread threadGame(&client::start, this, (int)buffer2[0], (int)buffer2[1]);
 
         threadGame.join();
         //printf("%s\n",buffer);
