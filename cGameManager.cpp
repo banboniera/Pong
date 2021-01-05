@@ -195,16 +195,22 @@ public:
             ScoreUp(player2);
     }
 
-    void player1Function(char current) {
-        this->current = current;
-        Input();
+    void player1SetPosition(int player1Y, int ballX, int ballY, int score1, int score2) {
+        this->player1->setY(player1Y);
+        this->ball->setX(ballX);
+        this->ball->setY(ballY);
+        this->score1 = score1;
+        this->score2 = score2;
+        Draw();
+    }
 
-        if (condition) { // condition ze dostal ten current posun od clienta, mozme dat ako dalsi parametr napriklad
-            mut.lock(); // hra sa zostavi
-        } else {
-            mut.unlock(); // hra zacne bezat
-        }
-        /*
+    void player2SetPosition(int posY) {
+        this->player2->setY(posY);
+        Draw();
+    }
+
+    void player1Function(std::mutex *mut, std::condition_variable *cvPlayer, std::condition_variable *cvBall) {
+        //Draw();
         while (quit == false) {
             //(*cvBall).notify_one();
             //(*cvPlayer).wait(lock);
@@ -213,58 +219,65 @@ public:
             if (current == up1)
                 if (player1->getY() > 0) {
                     player1->moveUp();
-                    Draw();
+                    //Draw();
                 }
             if (current == down1)
                 if (player1->getY() + 4 < height) {
                     player1->moveDown();
-                    Draw();
+                    //Draw();
                 }
-
             if (current == 'q')
                 quit = true;
-        */
+
+            //mut->unlock();
+        }
     }
 
-    string player1GetParams() {
-        string params(1, player1->getX());
-        params.push_back(player1->getY());
-        params.push_back(ball->getX());
-        params.push_back(ball->getY());
-        return params;
+    void player1GetParams(char *buffer) {
+        buffer[0] = player1->getY();
+        buffer[1] = ball->getX();
+        buffer[2] = ball->getY();
+        buffer[3] = score1;
+        buffer[4] = score2;
     }
 
-    void player2Function(std::mutex *mut, std::condition_variable *cvPlayer, std::condition_variable *cvBall) {
-        std::unique_lock<std::mutex> lock(*mut);
+    void player2GetParams(char *buffer) {
+        buffer[0] = player2->getY();
+    }
+
+    void player2Function(/*std::mutex *mut, std::condition_variable *cvPlayer, std::condition_variable *cvBall*/) {
+        //Draw();
+        //std::unique_lock<std::mutex> lock(*mut);
         while (quit == false) {
-            (*cvBall).notify_one();
-            (*cvPlayer).wait(lock);
-            char current = 'a';
-            cin >> current;
+            //(*cvBall).notify_one();
+            //(*cvPlayer).wait(lock);
+            char current = mygetch();
             if (current == up2)
                 if (player2->getY() > 0) {
                     player2->moveUp();
-                    Draw();
+                    //Draw();
                 }
             if (current == down2)
                 if (player2->getY() + 4 < height) {
                     player2->moveDown();
-                    Draw();
+                    //Draw();
                 }
-
             if (current == 'q')
                 quit = true;
         }
     }
 
+    bool getQuit() {
+        return this->quit;
+    }
+
     void ballFunction(std::mutex *mut, std::condition_variable *cvPlayer, std::condition_variable *cvBall) {
-        std::cout << "test7";
         std::unique_lock<std::mutex> lock(*mut);
         while (quit == false) {
             //(*cvPlayer).notify_all();
             //mut->lock();
             ball->Move();
-            Draw();
+            //Draw();
             //mut->unlock();
             //(*cvBall).wait(lock);
             if (ball->getDirection() == STOP)
@@ -280,11 +293,10 @@ public:
     }
 
     void Run() {
-        Draw();
-        //std::thread threadPlayer1(&cGameManager::player1Function, this, &mut, &cvPlayer, &cvBall);
+        std::thread threadPlayer1(&cGameManager::player1Function, this, &mut, &cvPlayer, &cvBall);
         std::thread threadBall(&cGameManager::ballFunction, this, &mut, &cvPlayer, &cvBall);
 
-        //threadPlayer1.join();
+        threadPlayer1.join();
         threadBall.join();
     }
 };
