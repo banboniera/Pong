@@ -2,44 +2,50 @@
 
 using namespace std;
 
-enum eDir { STOP = 0, LEFT = 1, UPLEFT = 2, DOWNLEFT = 3, RIGHT = 4, UPRIGHT = 5, DOWNRIGHT = 6 };
+enum eDir {
+    STOP = 0, LEFT = 1, UPLEFT = 2, DOWNLEFT = 3, RIGHT = 4, UPRIGHT = 5, DOWNRIGHT = 6
+};
 
-class cBall
-{
+class cBall {
 private:
     int x, y;
     int originalX, originalY;
     eDir direction;
 public:
-    cBall(int posX, int posY)
-    {
+    cBall(int posX, int posY) {
         originalX = posX;
         originalY = posY;
-        x = posX; y = posY;
+        x = posX;
+        y = posY;
         direction = STOP;
     }
-    void Reset()
-    {
-        x = originalX; y = originalY;
+
+    void Reset() {
+        x = originalX;
+        y = originalY;
         direction = STOP;
     }
-    void changeDirection(eDir d)
-    {
+
+    void changeDirection(eDir d) {
         direction = d;
     }
-    void randomDirection()
-    {
-        direction = (eDir)((rand() % 6) + 1);
+
+    void randomDirection() {
+        direction = (eDir) ((rand() % 6) + 1);
     }
+
     inline int getX() { return x; }
+
     inline int getY() { return y; }
+
     inline void setX(int x) { this->x = x; }
+
     inline void setY(int y) { this->y = y; }
+
     inline eDir getDirection() { return direction; }
-    void Move()
-    {
-        switch (direction)
-        {
+
+    void Move() {
+        switch (direction) {
             case STOP:
                 break;
             case LEFT:
@@ -49,23 +55,27 @@ public:
                 x++;
                 break;
             case UPLEFT:
-                x--; y--;
+                x--;
+                y--;
                 break;
             case DOWNLEFT:
-                x--; y++;
+                x--;
+                y++;
                 break;
             case UPRIGHT:
-                x++; y--;
+                x++;
+                y--;
                 break;
             case DOWNRIGHT:
-                x++; y++;
+                x++;
+                y++;
                 break;
             default:
                 break;
         }
     }
-    friend ostream& operator<<(ostream& o, cBall c)
-    {
+
+    friend ostream &operator<<(ostream &o, cBall c) {
         o << "Ball [" << c.x << "," << c.y << "][" << c.direction << "]";
         return o;
     }

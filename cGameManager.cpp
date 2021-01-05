@@ -1,5 +1,6 @@
 #include "cBall.cpp"
 #include "cPaddle.cpp"
+#include <sys/ioctl.h>
 #include <time.h>
 #include <curses.h>
 #include <thread>
@@ -12,7 +13,7 @@ class cGameManager {
 private:
     int width, height;
     int score1, score2;
-    char up1, down1, up2, down2, current;
+    char up1, down1, up2, down2;
     bool quit;
     cBall *ball;
     cPaddle *player1;
@@ -32,7 +33,6 @@ public:
         score1 = score2 = 0;
         width = w;
         height = h;
-        current = ' ';
         ball = new cBall(w / 2, h / 2);
         player1 = new cPaddle(1, h / 2 - 3);
         player2 = new cPaddle(w - 2, h / 2 - 3);
@@ -66,6 +66,27 @@ public:
         return (buf);
     }
 
+    /*
+     * Funkcia prevzata z webu:
+     * https://stackoverflow.com/questions/29335758/using-kbhit-and-getch-on-linux
+     */
+    bool kbhit()
+    {
+        termios term;
+        tcgetattr(0, &term);
+
+        termios term2 = term;
+        term2.c_lflag &= ~ICANON;
+        tcsetattr(0, TCSANOW, &term2);
+
+        int byteswaiting;
+        ioctl(0, FIONREAD, &byteswaiting);
+
+        tcsetattr(0, TCSANOW, &term);
+
+        return byteswaiting > 0;
+    }
+
     void ScoreUp(cPaddle *player) {
         if (player == player1)
             score1++;
@@ -74,7 +95,6 @@ public:
 
         ball->Reset();
         player1->Reset();
-        player2->Reset();
     }
 
     void Draw() {
@@ -182,22 +202,25 @@ public:
             //(*cvBall).notify_one();
             //(*cvPlayer).wait(lock);
             //mut->lock();
-            char current = mygetch();
-            if (current == up1)
-                if (player1->getY() > 0) {
-                    player1->moveUp();
-                    //Draw();
-                }
-            if (current == down1)
-                if (player1->getY() + 4 < height) {
-                    player1->moveDown();
-                    //Draw();
-                }
-            if (current == 'q')
-                quit = true;
+            if (kbhit()) {
+                char current = mygetch();
+                if (current == up1)
+                    if (player1->getY() > 0) {
+                        player1->moveUp();
+                        //Draw();
+                    }
+                if (current == down1)
+                    if (player1->getY() + 4 < height) {
+                        player1->moveDown();
+                        //Draw();
+                    }
+                if (current == 'q')
+                    quit = true;
 
-            //mut->unlock();
+                //mut->unlock();
+            }
         }
+        return;
     }
 
     void player1GetParams(char *buffer) {
@@ -218,27 +241,30 @@ public:
         while (quit == false) {
             //(*cvBall).notify_one();
             //(*cvPlayer).wait(lock);
-            char current = mygetch();
-            if (current == up2)
-                if (player2->getY() > 0) {
-                    player2->moveUp();
-                    //Draw();
-                }
-            if (current == down2)
-                if (player2->getY() + 4 < height) {
-                    player2->moveDown();
-                    //Draw();
-                }
-            if (current == 'q')
-                quit = true;
+            if (kbhit()) {
+                char current = mygetch();
+                if (current == up2)
+                    if (player2->getY() > 0) {
+                        player2->moveUp();
+                        //Draw();
+                    }
+                if (current == down2)
+                    if (player2->getY() + 4 < height) {
+                        player2->moveDown();
+                        //Draw();
+                    }
+                if (current == 'q')
+                    quit = true;
+            }
         }
+        return;
     }
 
     bool getQuit() {
         return this->quit;
     }
 
-    void setQuit(bool quit){
+    void setQuit(bool quit) {
         this->quit = quit;
     }
 
@@ -254,13 +280,26 @@ public:
             if (ball->getDirection() == STOP)
                 ball->randomDirection();
             Logic();
-            std::this_thread::sleep_for(0.5s);
+            std::this_thread::sleep_for(0.01s);
         }
+        return;
     }
 
     void setSize(int height, int width) {
         this->height = height;
         this->width = width;
+    }
+
+    int getScore1() {
+        return this->score1;
+    }
+
+    int getScore2() {
+        return this->score2;
+    }
+
+    void resetPlayer2() {
+        return player2->Reset();
     }
 
     void Run() {

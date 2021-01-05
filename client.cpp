@@ -12,7 +12,7 @@
 
 class client {
 private:
-    int sockfd, n, width, height;
+    int sockfd, n;
     struct sockaddr_in serv_addr;
     struct hostent *server;
     char buffer[256];
@@ -71,28 +71,34 @@ public:
             }
             if (n < 0) {
                 perror("Error writing to socket");
-                std::cout << "press q to exit\n";
                 return;
             }
             //-------------- READ from server --------------
             bzero(buffer, 256);
             n = read(sockfd, buffer, 255);
-            for (int i = 0; i < 5; i++){
+            for (int i = 0; i < 5; i++) {
                 buffer[i] = (int) buffer[i] - 1;
             }
-            std::cout << "client: "<< (int) buffer[5] << "\n";
             if ((int) buffer[5] == 1) {
                 std::cout << "server ukoncil hru\n";
-                std::cout << "press q to exit\n";
                 c->setQuit(true);
                 return;
             } else if (n < 0) {
                 perror("Error reading from socket");
-                std::cout << "press q to exit\n";
                 return;
             } else {
+                if ((((int) buffer[3]) > c->getScore1()) || (((int) buffer[4]) > c->getScore2())) {
+                    c->resetPlayer2();
+                }
                 c->player1SetPosition((int) buffer[0], (int) buffer[1], (int) buffer[2], (int) buffer[3],
-                                     (int) buffer[4]);
+                                      (int) buffer[4]);
+                if ((int) buffer[3] == 11 || (int) buffer[4] == 11) {
+                    cout << "hra skoncila, ";
+                    if ((int) buffer[3] == 11) cout << "hrac 1 vyhral so skore " << (int) buffer[3] << "\n";
+                    else cout << "hrac 2 vyhral so skore " << (int) buffer[4] << "\n";
+                    c->setQuit(true);
+                    return;
+                }
             }
         }
     }
