@@ -17,7 +17,7 @@ private:
     struct hostent *server;
     char buffer[256];
     char buffer2[2];
-    bool connectionTerminated = false;
+    cGameManager *c;
 public:
 
     /*
@@ -44,31 +44,9 @@ public:
         return (buf);
     }
 
-    void writeServer() {
-        do {
-            //printf("Please enter a message: ");
-            bzero(buffer, 256);
-            //fgets(buffer, 255, stdin);
-            buffer[0] = mygetch();
-            n = write(sockfd, buffer, strlen(buffer));
-
-            if (n < 0) {
-                perror("Error writing to socket");
-                return;
-            }
-
-            /*bzero(buffer, 256);
-            n = read(sockfd, buffer, 255);
-            if (n < 0) {
-                perror("Error reading from socket");
-                return;
-            }*/
-        } while (*buffer != 'q');
-    }
-
-    void start(int height, int width) {
-        c.setSize(height, width);
-        c.player2Function();
+    void start(int width, int height) {
+        c->setSize(height, width);
+        c->player2Function();
     }
 
     void readWriteServer() {
@@ -76,13 +54,15 @@ public:
         while (true) {
             //-------------- WRITE to server --------------
             bzero(buffer, 256);
-            c.player2GetParams(buffer);
-            if (c.getQuit()) {
+            std::this_thread::sleep_for(0.01s);
+            c->player2GetParams(buffer);
+            if (c->getQuit()) {
                 std::cout << "ukoncili ste hru\n";
                 buffer[10] = 1;
                 n = write(sockfd, buffer, strlen(buffer));
                 return;
             } else {
+                buffer[0] = (int)buffer[0] + 1;
                 n = write(sockfd, buffer, strlen(buffer));
             }
             if (n < 0) {
@@ -92,20 +72,19 @@ public:
             //-------------- READ from server --------------
             bzero(buffer, 256);
             n = read(sockfd, buffer, 255);
-            if (n < 0) {
-                perror("Error reading from socket");
-                return;
-            } else if ((int) buffer[10] == 1) {
+            buffer[0] = (int)buffer[0] - 1;
+            if ((int) buffer[10] == 1) {
                 std::cout << "server ukoncil hru\n";
                 return;
+            } else if (n < 0) {
+                perror("Error reading from socket");
+                std::cout << "press q to exit\n";
+                return;
             } else {
-                c.player1SetPosition((int) buffer[0], (int) buffer[1], (int) buffer[2], (int) buffer[3],
+                c->player1SetPosition((int) buffer[0], (int) buffer[1], (int) buffer[2], (int) buffer[3],
                                      (int) buffer[4]);
             }
-            /*bzero(buffer, 256);
-            buffer[10] = 1;
-            n = write(newsockfd, buffer, strlen(buffer));
-            connectionTerminated = true;*/
+
         }
     }
 
@@ -148,14 +127,14 @@ public:
             perror("Error reading from socket");
             return;
         }
-
-        std::thread threadReadWrite(&client::readWriteServer, this);
+        c = new cGameManager((int) buffer2[0], (int) buffer2[1]);
         std::thread threadGame(&client::start, this, (int) buffer2[0], (int) buffer2[1]);
+        std::thread threadReadWrite(&client::readWriteServer, this);
         std::cout << "startC" << "\n";
         threadGame.join();
         threadReadWrite.join();
         std::cout << "exitC" << "\n";
-        //printf("%s\n",buffer);
+        delete c;
         close(sockfd);
 
         return;

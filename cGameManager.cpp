@@ -271,6 +271,10 @@ public:
         return this->quit;
     }
 
+    void setQuit(bool quit){
+        this->quit = quit;
+    }
+
     void ballFunction(std::mutex *mut, std::condition_variable *cvPlayer, std::condition_variable *cvBall) {
         std::unique_lock<std::mutex> lock(*mut);
         while (quit == false) {
