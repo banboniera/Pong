@@ -6,7 +6,8 @@ int main(int argc, char *argv[]) {
     int a = 1;
     char input;
     do {
-        cin >> input;
+        std::cout << "Choose server (s) or client (c)" << "\n";
+        std::cin >> input;
         if (input == 'c') {
             client(argc, argv);
             a = 0;
