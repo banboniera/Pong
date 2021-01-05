@@ -20,6 +20,10 @@ private:
     cGameManager *c;
 public:
 
+    ~client() {
+        delete c;
+    }
+
     /*
      * Funkcia prevzata z webu:
      * https://stackoverflow.com/questions/421860/capture-characters-from-standard-input-without-waiting-for-enter-to-be-pressed
@@ -54,27 +58,33 @@ public:
         while (true) {
             //-------------- WRITE to server --------------
             bzero(buffer, 256);
-            std::this_thread::sleep_for(0.01s);
+            std::this_thread::sleep_for(0.03s);
             c->player2GetParams(buffer);
+            buffer[0] = (int) buffer[0] + 1;
             if (c->getQuit()) {
                 std::cout << "ukoncili ste hru\n";
-                buffer[10] = 1;
+                buffer[1] = 1;
                 n = write(sockfd, buffer, strlen(buffer));
                 return;
             } else {
-                buffer[0] = (int)buffer[0] + 1;
                 n = write(sockfd, buffer, strlen(buffer));
             }
             if (n < 0) {
                 perror("Error writing to socket");
+                std::cout << "press q to exit\n";
                 return;
             }
             //-------------- READ from server --------------
             bzero(buffer, 256);
             n = read(sockfd, buffer, 255);
-            buffer[0] = (int)buffer[0] - 1;
-            if ((int) buffer[10] == 1) {
+            for (int i = 0; i < 5; i++){
+                buffer[i] = (int) buffer[i] - 1;
+            }
+            std::cout << "client: "<< (int) buffer[5] << "\n";
+            if ((int) buffer[5] == 1) {
                 std::cout << "server ukoncil hru\n";
+                std::cout << "press q to exit\n";
+                c->setQuit(true);
                 return;
             } else if (n < 0) {
                 perror("Error reading from socket");
@@ -84,7 +94,6 @@ public:
                 c->player1SetPosition((int) buffer[0], (int) buffer[1], (int) buffer[2], (int) buffer[3],
                                      (int) buffer[4]);
             }
-
         }
     }
 
@@ -134,7 +143,6 @@ public:
         threadGame.join();
         threadReadWrite.join();
         std::cout << "exitC" << "\n";
-        delete c;
         close(sockfd);
 
         return;

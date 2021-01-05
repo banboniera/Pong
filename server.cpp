@@ -17,6 +17,11 @@ private:
     char buffer[256];
     cGameManager *c;
 public:
+
+    ~server() {
+        delete c;
+    }
+
     void start(int width, int height) {
         c->setSize(height, width);
         c->Run();
@@ -27,33 +32,38 @@ public:
         while (true) {
             //-------------- READ from client --------------
             n = read(newsockfd, buffer, 255);
-            buffer[0] = (int) buffer[0] - 1;
-            if (n < 0) {
+            if ((int) buffer[1] == 1) {
+                std::cout << "klient ukoncil hru\n";
+                std::cout << "press q to exit\n";
+                c->setQuit(true);
+                return;
+            } else if (n < 0) {
                 c->setQuit(true);
                 perror("Error reading from socket");
                 std::cout << "press q to exit\n";
                 return;
-            } else if ((int) buffer[10] == 1) {
-                std::cout << "klient ukoncil hru\n";
-                return;
             } else {
+                buffer[0] = (int) buffer[0] - 1;
                 c->player2SetPosition((int) buffer[0]);
             }
             bzero(buffer, 256);
             //-------------- WRITE to client --------------
-            std::this_thread::sleep_for(0.01s);
+            std::this_thread::sleep_for(0.03s);
             c->player1GetParams(buffer);
+            for (int i = 0; i < 5; i++){
+                buffer[i] = (int) buffer[i] + 1;
+            }
             if (c->getQuit()) {
                 std::cout << "ukoncili ste hru\n";
-                buffer[10] = 1;
+                buffer[5] = 1;
                 n = write(newsockfd, buffer, strlen(buffer));
                 return;
             } else {
-                buffer[0] = (int) buffer[0] + 1;
                 n = write(newsockfd, buffer, strlen(buffer));
             }
             if (n < 0) {
                 perror("Error writing to socket");
+                std::cout << "press q to exit\n";
                 return;
             }
             bzero(buffer, 256);
@@ -106,11 +116,10 @@ public:
         std::cout << "startS" << "\n";
         threadReadWrite.join();
         threadGame.join();
-
-
+        std::cout << "exitS" << "\n";
         close(newsockfd);
         close(sockfd);
-        delete c;
-        std::cout << "exitS" << "\n";
+
+
     }
 };

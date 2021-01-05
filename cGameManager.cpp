@@ -128,39 +128,6 @@ public:
         cout << "Score 1: " << score1 << endl << "Score 2: " << score2 << endl;
     }
 
-    void Input() {
-        int player1y = player1->getY();
-        int player2y = player2->getY();
-        current = mygetch();
-
-        if (current == up1)
-            if (player1y > 0) {
-                player1->moveUp();
-                Draw();
-            }
-
-        if (current == up2)
-            if (player2y > 0) {
-                player2->moveUp();
-                Draw();
-            }
-
-        if (current == down1)
-            if (player1y + 4 < height) {
-                player1->moveDown();
-                Draw();
-            }
-
-        if (current == down2)
-            if (player2y + 4 < height) {
-                player2->moveDown();
-                Draw();
-            }
-
-        if (current == 'q')
-            quit = true;
-    }
-
     void Logic() {
         int ballx = ball->getX();
         int bally = ball->getY();
