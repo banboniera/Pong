@@ -5,7 +5,7 @@
       <paths name="frios2 (915ba119-4860-41c1-ad27-13fdd7e35d2c)">
         <serverdata>
           <mappings>
-            <mapping local="$PROJECT_DIR$" web="/" />
+            <mapping deploy="/tmp/tmp.ml8kS3YTiM" local="$PROJECT_DIR$" />
           </mappings>
         </serverdata>
       </paths>

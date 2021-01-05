@@ -19,7 +19,9 @@
     <select />
   </component>
   <component name="CMakeRunConfigurationManager" shouldGenerate="true" shouldDeleteObsolete="true">
-    <generated />
+    <generated>
+      <config projectName="semestralka" targetName="semestralka" />
+    </generated>
   </component>
   <component name="CMakeSettings">
     <configurations>
@@ -27,30 +29,9 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="bc857d77-f120-41b1-b2ab-c7952c27cd33" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.vs/Pong/v16/.suo" beforeDir="false" afterPath="$PROJECT_DIR$/.vs/Pong/v16/.suo" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.vs/Pong/v16/Browse.VC.db" beforeDir="false" afterPath="$PROJECT_DIR$/.vs/Pong/v16/Browse.VC.db" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.vs/Pong/v16/ipch/AutoPCH/77bac205a0a1e035/MAIN.ipch" beforeDir="false" afterPath="$PROJECT_DIR$/.vs/Pong/v16/ipch/AutoPCH/77bac205a0a1e035/MAIN.ipch" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Debug/Pong.exe" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Debug/Pong.ilk" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Debug/Pong.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/Debug/Pong.pdb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Pong/Debug/Pong.log" beforeDir="false" afterPath="$PROJECT_DIR$/Pong/Debug/Pong.log" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Pong/Debug/Pong.tlog/CL.command.1.tlog" beforeDir="false" afterPath="$PROJECT_DIR$/Pong/Debug/Pong.tlog/CL.command.1.tlog" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Pong/Debug/Pong.tlog/CL.read.1.tlog" beforeDir="false" afterPath="$PROJECT_DIR$/Pong/Debug/Pong.tlog/CL.read.1.tlog" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Pong/Debug/Pong.tlog/CL.write.1.tlog" beforeDir="false" afterPath="$PROJECT_DIR$/Pong/Debug/Pong.tlog/CL.write.1.tlog" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Pong/Debug/Pong.tlog/link.command.1.tlog" beforeDir="false" afterPath="$PROJECT_DIR$/Pong/Debug/Pong.tlog/link.command.1.tlog" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Pong/Debug/Pong.tlog/link.read.1.tlog" beforeDir="false" afterPath="$PROJECT_DIR$/Pong/Debug/Pong.tlog/link.read.1.tlog" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Pong/Debug/Pong.tlog/link.write.1.tlog" beforeDir="false" afterPath="$PROJECT_DIR$/Pong/Debug/Pong.tlog/link.write.1.tlog" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Pong/Debug/cBall.obj" beforeDir="false" afterPath="$PROJECT_DIR$/Pong/Debug/cBall.obj" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Pong/Debug/cGameManger.obj" beforeDir="false" afterPath="$PROJECT_DIR$/Pong/Debug/cGameManger.obj" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Pong/Debug/cPaddle.obj" beforeDir="false" afterPath="$PROJECT_DIR$/Pong/Debug/cPaddle.obj" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Pong/Debug/main.obj" beforeDir="false" afterPath="$PROJECT_DIR$/Pong/Debug/main.obj" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Pong/Debug/vc142.idb" beforeDir="false" afterPath="$PROJECT_DIR$/Pong/Debug/vc142.idb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Pong/Debug/vc142.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/Pong/Debug/vc142.pdb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Pong/Pong.vcxproj" beforeDir="false" afterPath="$PROJECT_DIR$/Pong/Pong.vcxproj" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Pong/Pong.vcxproj.filters" beforeDir="false" afterPath="$PROJECT_DIR$/Pong/Pong.vcxproj.filters" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Pong/cGameManger.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Pong/cGameManger.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Pong/main.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Pong/main.cpp" afterDir="false" />
+    <list default="true" id="a34cb728-d5b2-44f9-a075-b42905cd1f09" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/deployment.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/deployment.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/main.cpp" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -58,38 +39,58 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="ClangdSettings">
+    <option name="clangTidyViaClangd" value="false" />
     <option name="formatViaClangd" value="false" />
   </component>
+  <component name="ExecutionTargetManager" SELECTED_TARGET="CMakeBuildProfile:Debug" />
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="ProjectId" id="1mVwWPRhzHHaYgd2AwJ8ZYshjLv" />
+  <component name="ProjectId" id="1mYZ8rHYtL2HS8a6FJre3NTmBea" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
   <component name="PropertiesComponent">
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
+    <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="true" />
     <property name="cf.first.check.clang-format" value="false" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="node.js.detected.package.eslint" value="true" />
+    <property name="node.js.detected.package.tslint" value="true" />
+    <property name="node.js.path.for.package.eslint" value="project" />
+    <property name="node.js.path.for.package.tslint" value="project" />
+    <property name="node.js.selected.package.eslint" value="(autodetect)" />
+    <property name="node.js.selected.package.tslint" value="(autodetect)" />
+  </component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="D:\Stol\5 semestr\POS\semestralka\Pong\Pong" />
+    </key>
   </component>
   <component name="RunManager">
-    <configuration default="true" type="GradleAppRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" PASS_PARENT_ENVS_2="true">
+    <configuration name="semestralka" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="semestralka" TARGET_NAME="semestralka" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="semestralka" RUN_TARGET_NAME="semestralka">
       <method v="2">
-        <option name="com.jetbrains.cidr.cpp.gradle.execution.GradleNativeBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
     </configuration>
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
-      <changelist id="bc857d77-f120-41b1-b2ab-c7952c27cd33" name="Default Changelist" comment="" />
-      <created>1609592097232</created>
+      <changelist id="a34cb728-d5b2-44f9-a075-b42905cd1f09" name="Default Changelist" comment="" />
+      <created>1609672338734</created>
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
-      <updated>1609592097232</updated>
-      <workItem from="1609592102397" duration="47000" />
+      <updated>1609672338734</updated>
+      <workItem from="1609672340011" duration="2065000" />
+      <workItem from="1609674572967" duration="2916000" />
+      <workItem from="1609695554534" duration="3203000" />
+      <workItem from="1609699869952" duration="3855000" />
+      <workItem from="1609735213565" duration="4097000" />
+      <workItem from="1609765839723" duration="2241000" />
+      <workItem from="1609822238084" duration="351000" />
     </task>
     <servers />
   </component>
@@ -106,5 +107,40 @@
         </entry>
       </map>
     </option>
+    <option name="oldMeFiltersMigrated" value="true" />
+  </component>
+  <component name="WindowStateProjectService">
+    <state x="223" y="67" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1609737861050">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state x="223" y="67" key="#com.intellij.execution.impl.EditConfigurationsDialog/1920.0.1920.1030/0.0.1536.824@0.0.1536.824" timestamp="1609737861050" />
+    <state x="549" y="167" key="FileChooserDialogImpl" timestamp="1609674410287">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state x="549" y="167" key="FileChooserDialogImpl/1920.0.1920.1030/0.0.1536.824@0.0.1536.824" timestamp="1609674410287" />
+    <state width="746" height="210" key="GridCell.Tab.0.bottom" timestamp="1609699840303">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state width="746" height="210" key="GridCell.Tab.0.bottom/1920.0.1920.1030/0.0.1536.824@0.0.1536.824" timestamp="1609699840303" />
+    <state width="746" height="210" key="GridCell.Tab.0.center" timestamp="1609699840303">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state width="746" height="210" key="GridCell.Tab.0.center/1920.0.1920.1030/0.0.1536.824@0.0.1536.824" timestamp="1609699840303" />
+    <state width="746" height="210" key="GridCell.Tab.0.left" timestamp="1609699840303">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state width="746" height="210" key="GridCell.Tab.0.left/1920.0.1920.1030/0.0.1536.824@0.0.1536.824" timestamp="1609699840303" />
+    <state width="746" height="210" key="GridCell.Tab.0.right" timestamp="1609699840303">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state width="746" height="210" key="GridCell.Tab.0.right/1920.0.1920.1030/0.0.1536.824@0.0.1536.824" timestamp="1609699840303" />
+    <state x="478" y="145" width="579" height="534" key="find.popup" timestamp="1609696111969">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state x="478" y="145" width="579" height="534" key="find.popup/1920.0.1920.1030/0.0.1536.824@0.0.1536.824" timestamp="1609696111969" />
+    <state x="431" y="145" width="672" height="678" key="search.everywhere.popup" timestamp="1609673681670">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state x="431" y="145" width="672" height="678" key="search.everywhere.popup/1920.0.1920.1030/0.0.1536.824@0.0.1536.824" timestamp="1609673681670" />
   </component>
 </project>
