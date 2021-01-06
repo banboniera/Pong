@@ -1,5 +1,6 @@
 #include "cBall.cpp"
 #include "cPaddle.cpp"
+#include <sys/ioctl.h>
 #include <time.h>
 #include <curses.h>
 #include <thread>
@@ -8,19 +9,20 @@
 #include <termios.h>
 #include <unistd.h>
 
+using namespace std;
+
 class cGameManager {
 private:
     int width, height;
     int score1, score2;
-    char up1, down1, up2, down2, current;
+    char up1, down1, up2, down2, nicknameServer, nicknameClient;
     bool quit;
     cBall *ball;
     cPaddle *player1;
     cPaddle *player2;
-    std::mutex mut;
-    std::condition_variable cvBall;
-    std::condition_variable cvPlayer;
-
+    mutex mut;
+    condition_variable cvBall;
+    condition_variable cvPlayer;
 public:
     cGameManager(int w, int h) {
         srand(time(NULL));
@@ -32,7 +34,6 @@ public:
         score1 = score2 = 0;
         width = w;
         height = h;
-        current = ' ';
         ball = new cBall(w / 2, h / 2);
         player1 = new cPaddle(1, h / 2 - 3);
         player2 = new cPaddle(w - 2, h / 2 - 3);
@@ -49,21 +50,40 @@ public:
     char mygetch() {
         char buf = 0;
         struct termios old = {0};
+
         if (tcgetattr(0, &old) < 0)
             perror("tcsetattr()");
         old.c_lflag &= ~ICANON;
         old.c_lflag &= ~ECHO;
         old.c_cc[VMIN] = 1;
         old.c_cc[VTIME] = 0;
+
         if (tcsetattr(0, TCSANOW, &old) < 0)
             perror("tcsetattr ICANON");
         if (read(0, &buf, 1) < 0)
             perror("read()");
         old.c_lflag |= ICANON;
         old.c_lflag |= ECHO;
+
         if (tcsetattr(0, TCSADRAIN, &old) < 0)
             perror("tcsetattr ~ICANON");
         return (buf);
+    }
+
+    /*
+     * Funkcia prevzata z webu:
+     * https://stackoverflow.com/questions/29335758/using-kbhit-and-getch-on-linux
+     */
+    bool kbhit() {
+        termios term;
+        tcgetattr(0, &term);
+        termios term2 = term;
+        term2.c_lflag &= ~ICANON;
+        tcsetattr(0, TCSANOW, &term2);
+        int byteswaiting;
+        ioctl(0, FIONREAD, &byteswaiting);
+        tcsetattr(0, TCSANOW, &term);
+        return byteswaiting > 0;
     }
 
     void ScoreUp(cPaddle *player) {
@@ -71,10 +91,8 @@ public:
             score1++;
         else if (player == player2)
             score2++;
-
         ball->Reset();
         player1->Reset();
-        player2->Reset();
     }
 
     void Draw() {
@@ -124,41 +142,8 @@ public:
         for (int i = 0; i < width + 2; i++)
             cout << "\xB2";
         cout << endl;
-
-        cout << "Score 1: " << score1 << endl << "Score 2: " << score2 << endl;
-    }
-
-    void Input() {
-        int player1y = player1->getY();
-        int player2y = player2->getY();
-        current = mygetch();
-
-        if (current == up1)
-            if (player1y > 0) {
-                player1->moveUp();
-                Draw();
-            }
-
-        if (current == up2)
-            if (player2y > 0) {
-                player2->moveUp();
-                Draw();
-            }
-
-        if (current == down1)
-            if (player1y + 4 < height) {
-                player1->moveDown();
-                Draw();
-            }
-
-        if (current == down2)
-            if (player2y + 4 < height) {
-                player2->moveDown();
-                Draw();
-            }
-
-        if (current == 'q')
-            quit = true;
+        cout << "1. " << nicknameServer <<": " << score1 << endl
+        << "2. " << nicknameClient <<": " << score2 << endl;
     }
 
     void Logic() {
@@ -168,19 +153,16 @@ public:
         int player2x = player2->getX();
         int player1y = player1->getY();
         int player2y = player2->getY();
-
         //left paddle
         for (int i = 0; i < 4; i++)
             if (ballx == player1x + 1)
                 if (bally == player1y + i)
                     ball->changeDirection((eDir) ((rand() % 3) + 4));
-
         //right paddle
         for (int i = 0; i < 4; i++)
             if (ballx == player2x - 1)
                 if (bally == player2y + i)
                     ball->changeDirection((eDir) ((rand() % 3) + 1));
-
         //bottom wall
         if (bally == height - 1)
             ball->changeDirection(ball->getDirection() == DOWNRIGHT ? UPRIGHT : UPLEFT);
@@ -209,27 +191,28 @@ public:
         Draw();
     }
 
-    void player1Function(std::mutex *mut, std::condition_variable *cvPlayer, std::condition_variable *cvBall) {
+    void player1Function(mutex *mut, condition_variable *cvPlayer, condition_variable *cvBall) {
         //Draw();
         while (quit == false) {
             //(*cvBall).notify_one();
             //(*cvPlayer).wait(lock);
             //mut->lock();
-            char current = mygetch();
-            if (current == up1)
-                if (player1->getY() > 0) {
-                    player1->moveUp();
-                    //Draw();
-                }
-            if (current == down1)
-                if (player1->getY() + 4 < height) {
-                    player1->moveDown();
-                    //Draw();
-                }
-            if (current == 'q')
-                quit = true;
-
-            //mut->unlock();
+            if (kbhit()) {
+                char current = mygetch();
+                if (current == up1)
+                    if (player1->getY() > 0) {
+                        player1->moveUp();
+                        //Draw();
+                    }
+                if (current == down1)
+                    if (player1->getY() + 4 < height) {
+                        player1->moveDown();
+                        //Draw();
+                    }
+                if (current == 'q')
+                    quit = true;
+                //mut->unlock();
+            }
         }
     }
 
@@ -245,25 +228,27 @@ public:
         buffer[0] = player2->getY();
     }
 
-    void player2Function(/*std::mutex *mut, std::condition_variable *cvPlayer, std::condition_variable *cvBall*/) {
+    void player2Function(/*mutex *mut, condition_variable *cvPlayer, condition_variable *cvBall*/) {
         //Draw();
-        //std::unique_lock<std::mutex> lock(*mut);
+        //unique_lock<mutex> lock(*mut);
         while (quit == false) {
             //(*cvBall).notify_one();
             //(*cvPlayer).wait(lock);
-            char current = mygetch();
-            if (current == up2)
-                if (player2->getY() > 0) {
-                    player2->moveUp();
-                    //Draw();
-                }
-            if (current == down2)
-                if (player2->getY() + 4 < height) {
-                    player2->moveDown();
-                    //Draw();
-                }
-            if (current == 'q')
-                quit = true;
+            if (kbhit()) {
+                char current = mygetch();
+                if (current == up2)
+                    if (player2->getY() > 0) {
+                        player2->moveUp();
+                        //Draw();
+                    }
+                if (current == down2)
+                    if (player2->getY() + 4 < height) {
+                        player2->moveDown();
+                        //Draw();
+                    }
+                if (current == 'q')
+                    quit = true;
+            }
         }
     }
 
@@ -271,8 +256,12 @@ public:
         return this->quit;
     }
 
-    void ballFunction(std::mutex *mut, std::condition_variable *cvPlayer, std::condition_variable *cvBall) {
-        std::unique_lock<std::mutex> lock(*mut);
+    void setQuit(bool quit) {
+        this->quit = quit;
+    }
+
+    void ballFunction(mutex *mut, condition_variable *cvPlayer, condition_variable *cvBall) {
+        unique_lock<mutex> lock(*mut);
         while (quit == false) {
             //(*cvPlayer).notify_all();
             //mut->lock();
@@ -283,19 +272,35 @@ public:
             if (ball->getDirection() == STOP)
                 ball->randomDirection();
             Logic();
-            std::this_thread::sleep_for(0.5s);
+            this_thread::sleep_for(0.01s);
         }
     }
 
-    void setSize(int height, int width) {
+    void setInitial(int height, int width, char nicknameServer) {
         this->height = height;
         this->width = width;
+        this->nicknameServer = nicknameServer;
+    }
+
+    void setClientNickname(char nicknameClient){
+        this->nicknameClient = nicknameClient;
+    }
+
+    int getScore1() {
+        return this->score1;
+    }
+
+    int getScore2() {
+        return this->score2;
+    }
+
+    void resetPlayer2() {
+        return player2->Reset();
     }
 
     void Run() {
-        std::thread threadPlayer1(&cGameManager::player1Function, this, &mut, &cvPlayer, &cvBall);
-        std::thread threadBall(&cGameManager::ballFunction, this, &mut, &cvPlayer, &cvBall);
-
+        thread threadPlayer1(&cGameManager::player1Function, this, &mut, &cvPlayer, &cvBall);
+        thread threadBall(&cGameManager::ballFunction, this, &mut, &cvPlayer, &cvBall);
         threadPlayer1.join();
         threadBall.join();
     }
