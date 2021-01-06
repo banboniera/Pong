@@ -4,7 +4,7 @@
 CMakeFiles/semestralka.dir/main.cpp.o: ../cBall.cpp
 CMakeFiles/semestralka.dir/main.cpp.o: ../cGameManager.cpp
 CMakeFiles/semestralka.dir/main.cpp.o: ../cPaddle.cpp
-CMakeFiles/semestralka.dir/main.cpp.o: ../klient.cpp
+CMakeFiles/semestralka.dir/main.cpp.o: ../client.cpp
 CMakeFiles/semestralka.dir/main.cpp.o: ../main.cpp
 CMakeFiles/semestralka.dir/main.cpp.o: ../server.cpp
 

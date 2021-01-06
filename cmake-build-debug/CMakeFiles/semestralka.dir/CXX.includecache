@@ -6,20 +6,20 @@
 
 #IncludeRegexTransform: 
 
-/tmp/tmp.oWoqYrIao7/cBall.cpp
+/tmp/tmp.bpANINniQb/cBall.cpp
 iostream
 -
 
-/tmp/tmp.oWoqYrIao7/cGameManager.cpp
+/tmp/tmp.bpANINniQb/cGameManager.cpp
 cBall.cpp
-/tmp/tmp.oWoqYrIao7/cBall.cpp
+/tmp/tmp.bpANINniQb/cBall.cpp
 cPaddle.cpp
-/tmp/tmp.oWoqYrIao7/cPaddle.cpp
+/tmp/tmp.bpANINniQb/cPaddle.cpp
+sys/ioctl.h
+-
 time.h
 -
 curses.h
--
-pthread.h
 -
 thread
 -
@@ -32,17 +32,11 @@ termios.h
 unistd.h
 -
 
-/tmp/tmp.oWoqYrIao7/cPaddle.cpp
+/tmp/tmp.bpANINniQb/cPaddle.cpp
 iostream
 -
 
-/tmp/tmp.oWoqYrIao7/klient.cpp
-sys/types.h
--
-sys/socket.h
--
-netinet/in.h
--
+/tmp/tmp.bpANINniQb/client.cpp
 netdb.h
 -
 stdio.h
@@ -60,31 +54,33 @@ unistd.h
 termios.h
 -
 
-/tmp/tmp.oWoqYrIao7/main.cpp
+/tmp/tmp.bpANINniQb/main.cpp
 sys/types.h
 -
 server.cpp
-/tmp/tmp.oWoqYrIao7/server.cpp
-klient.cpp
-/tmp/tmp.oWoqYrIao7/klient.cpp
+/tmp/tmp.bpANINniQb/server.cpp
+client.cpp
+/tmp/tmp.bpANINniQb/client.cpp
 
-/tmp/tmp.oWoqYrIao7/server.cpp
-sys/types.h
--
+/tmp/tmp.bpANINniQb/server.cpp
 sys/socket.h
 -
 netinet/in.h
 -
-stdio.h
+cstdio
 -
-stdlib.h
+cstdlib
 -
-string.h
+cstring
 -
 unistd.h
 -
 iostream
 -
+chrono
+-
+fstream
+-
 cGameManager.cpp
-/tmp/tmp.oWoqYrIao7/cGameManager.cpp
+/tmp/tmp.bpANINniQb/cGameManager.cpp
 
