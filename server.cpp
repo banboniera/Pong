@@ -126,7 +126,7 @@ public:
         close(newsockfd);
         close(sockfd);
 
-        string line;
+        /*string line;
         int bestTime[5];
         ifstream readFile ("BestTime.txt");
         if (readFile.is_open())
@@ -162,6 +162,6 @@ public:
             }
             writeFile.close();
         }
-        else cout << "Unable to open file";
+        else cout << "Unable to open file";*/
     }
 };

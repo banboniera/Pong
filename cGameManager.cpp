@@ -41,7 +41,9 @@ public:
     }
 
     ~cGameManager() {
-        delete ball, player1, player2;
+        delete this->ball;
+        delete this->player1;
+        delete this->player2;
     }
 
     /*
@@ -188,12 +190,12 @@ public:
         mutBall.unlock();
         this->score1 = score1;
         this->score2 = score2;
-        Draw();
+        //Draw();
     }
 
     void player2SetPosition(int posY) {
         this->player2->setY(posY);
-        Draw();
+        //Draw();
     }
 
     void player1Function(/*mutex *mut, condition_variable *cvPlayer, condition_variable *cvBall*/) {
