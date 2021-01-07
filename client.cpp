@@ -15,12 +15,13 @@ private:
     struct sockaddr_in serv_addr;
     struct hostent *server;
     char buffer[256];
-    char buffer2[2];
+    string nicknameServer, nicknameClient;
     cGameManager *c;
 public:
     ~client() {
         delete c;
     }
+
     /*
      * Funkcia prevzata z webu:
      * https://stackoverflow.com/questions/421860/capture-characters-from-standard-input-without-waiting-for-enter-to-be-pressed
@@ -45,8 +46,7 @@ public:
         return (buf);
     }
 
-    void start(int width, int height, char nicknameServer ) {
-        c->setInitial(height, width, nicknameServer);
+    void start() {
         c->player2Function();
     }
 
@@ -132,14 +132,21 @@ public:
             return;
         }
         bzero(buffer, 2);
-        n = read(sockfd, buffer2, 2);
+        n = read(sockfd, buffer, 2);
 
         if (n < 0) {
             perror("Error reading from socket");
             return;
         }
+
         c = new cGameManager((int) buffer[0], (int) buffer[1]);
-        thread threadGame(&client::start, this, (int) buffer[0], (int) buffer[1], buffer[2]);
+        c->setServerNickname(nicknameServer);
+        cout << "Enter nickname: \n";
+        cin >> nicknameClient;
+        c->setClientNickname(nicknameClient);
+        nicknameServer = buffer;
+        nicknameServer = nicknameServer.substr(3 + 1, buffer[3]);
+        thread threadGame(&client::start, this);
         thread threadReadWrite(&client::readWriteServer, this);
         threadGame.join();
         threadReadWrite.join();

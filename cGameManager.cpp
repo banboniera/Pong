@@ -15,12 +15,14 @@ class cGameManager {
 private:
     int width, height;
     int score1, score2;
-    char up1, down1, up2, down2, nicknameServer, nicknameClient;
+    char up1, down1, up2, down2;
+    string nicknameServer, nicknameClient;
     bool quit;
     cBall *ball;
     cPaddle *player1;
     cPaddle *player2;
     mutex mut;
+    mutex mutBall;
     condition_variable cvBall;
     condition_variable cvPlayer;
 public:
@@ -40,7 +42,9 @@ public:
     }
 
     ~cGameManager() {
-        delete ball, player1, player2;
+        delete this->ball;
+        delete this->player1;
+        delete this->player2;
     }
 
     /*
@@ -142,8 +146,8 @@ public:
         for (int i = 0; i < width + 2; i++)
             cout << "\xB2";
         cout << endl;
-        cout << "1. " << nicknameServer <<": " << score1 << endl
-        << "2. " << nicknameClient <<": " << score2 << endl;
+        cout << "1. " << nicknameServer << ": " << score1 << endl
+             << "2. " << nicknameClient << ": " << score2 << endl;
     }
 
     void Logic() {
@@ -178,26 +182,30 @@ public:
     }
 
     void player1SetPosition(int player1Y, int ballX, int ballY, int score1, int score2) {
+        mut.lock();
         this->player1->setY(player1Y);
+        mut.unlock();
+        mutBall.lock();
         this->ball->setX(ballX);
         this->ball->setY(ballY);
+        mutBall.unlock();
         this->score1 = score1;
         this->score2 = score2;
-        Draw();
+        //Draw();
     }
 
     void player2SetPosition(int posY) {
         this->player2->setY(posY);
-        Draw();
+        //Draw();
     }
 
-    void player1Function(mutex *mut, condition_variable *cvPlayer, condition_variable *cvBall) {
+    void player1Function(/*mutex *mut, condition_variable *cvPlayer, condition_variable *cvBall*/) {
         //Draw();
         while (quit == false) {
             //(*cvBall).notify_one();
             //(*cvPlayer).wait(lock);
-            //mut->lock();
             if (kbhit()) {
+                mut.lock();
                 char current = mygetch();
                 if (current == up1)
                     if (player1->getY() > 0) {
@@ -211,21 +219,27 @@ public:
                     }
                 if (current == 'q')
                     quit = true;
-                //mut->unlock();
+                mut.unlock();
             }
         }
     }
 
     void player1GetParams(char *buffer) {
+        mut.lock();
         buffer[0] = player1->getY();
+        mut.unlock();
+        mutBall.lock();
         buffer[1] = ball->getX();
         buffer[2] = ball->getY();
+        mutBall.unlock();
         buffer[3] = score1;
         buffer[4] = score2;
     }
 
     void player2GetParams(char *buffer) {
+        mut.lock();
         buffer[0] = player2->getY();
+        mut.unlock();
     }
 
     void player2Function(/*mutex *mut, condition_variable *cvPlayer, condition_variable *cvBall*/) {
@@ -235,6 +249,7 @@ public:
             //(*cvBall).notify_one();
             //(*cvPlayer).wait(lock);
             if (kbhit()) {
+                mut.lock();
                 char current = mygetch();
                 if (current == up2)
                     if (player2->getY() > 0) {
@@ -248,6 +263,7 @@ public:
                     }
                 if (current == 'q')
                     quit = true;
+                mut.unlock();
             }
         }
     }
@@ -260,29 +276,27 @@ public:
         this->quit = quit;
     }
 
-    void ballFunction(mutex *mut, condition_variable *cvPlayer, condition_variable *cvBall) {
-        unique_lock<mutex> lock(*mut);
+    void ballFunction(/*mutex *mut, condition_variable *cvPlayer, condition_variable *cvBall*/) {
+        //unique_lock<mutex> lock(*mut);
         while (quit == false) {
             //(*cvPlayer).notify_all();
-            //mut->lock();
+            mutBall.lock();
             ball->Move();
             //Draw();
-            //mut->unlock();
+            mutBall.unlock();
             //(*cvBall).wait(lock);
             if (ball->getDirection() == STOP)
                 ball->randomDirection();
             Logic();
-            this_thread::sleep_for(0.01s);
+            this_thread::sleep_for(0.2s);
         }
     }
 
-    void setInitial(int height, int width, char nicknameServer) {
-        this->height = height;
-        this->width = width;
+    void setServerNickname(string nicknameServer) {
         this->nicknameServer = nicknameServer;
     }
 
-    void setClientNickname(char nicknameClient){
+    void setClientNickname(string nicknameClient) {
         this->nicknameClient = nicknameClient;
     }
 
@@ -299,8 +313,8 @@ public:
     }
 
     void Run() {
-        thread threadPlayer1(&cGameManager::player1Function, this, &mut, &cvPlayer, &cvBall);
-        thread threadBall(&cGameManager::ballFunction, this, &mut, &cvPlayer, &cvBall);
+        thread threadPlayer1(&cGameManager::player1Function, this/*, &mut, &cvPlayer, &cvBall*/);
+        thread threadBall(&cGameManager::ballFunction, this/*, &mut, &cvPlayer, &cvBall*/);
         threadPlayer1.join();
         threadBall.join();
     }
