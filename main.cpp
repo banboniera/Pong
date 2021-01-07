@@ -2,9 +2,23 @@
 #include "server.cpp"
 #include "client.cpp"
 
+void showBestTime() {
+    string line;
+    ifstream readFile("BestTime.txt");
+    if (readFile.is_open()) {
+        for (int i = 0; i < 5; i++) {
+            getline(readFile, line);
+            cout << "Best time: " << "\n";
+            cout << i << ". " << stoi(line) << "\n";
+        }
+        readFile.close();
+    }
+}
+
 int main(int argc, char *argv[]) {
     int height, width, a = 1;
-    char input, nicknameServer;
+    char input;
+    string nicknameServer;
     do {
         if (a == 1) {
             cout << "\n";
@@ -20,8 +34,8 @@ int main(int argc, char *argv[]) {
             system("clear");
             cout << "Enter nickname: \n";
             cin >> nicknameServer;
-            if(nicknameServer = '\0'){
-                nicknameServer = 'P';
+            if (nicknameServer == "") {
+                nicknameServer = "Player1";
             }
             cout << "Enter height (min 10): \n";
             cin >> height;
@@ -37,24 +51,10 @@ int main(int argc, char *argv[]) {
             a = 0;
         }
         if (input == 'b') {
-            //showBestTime();
+            showBestTime();
         }
         if (input == 'q') {
             a = 0;
         }
     } while (a > 0);
-}
-
-static void showBestTime(){
-    string line;
-    ifstream readFile ("BestTime.txt");
-    if (readFile.is_open())
-    {
-        for(int i = 0; i < 5; i++){
-            getline (readFile,line);
-            cout << "Best time: " <<  "\n";
-            cout << i << ". " <<stoi(line) <<  "\n";
-        }
-        readFile.close();
-    }
 }

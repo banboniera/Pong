@@ -11,6 +11,41 @@
 
 using namespace std;
 
+void writeTime() {
+    string timeArray[10];
+    ifstream readFile("BestTime.txt");
+    if (readFile.is_open()) {
+        for (int i = 0; i < 10; i++) {
+            readFile >> timeArray[i];
+        }
+        readFile.close();
+    } else cout << "Unable to open file";
+    auto finish = chrono::high_resolution_clock::now();
+    /* ------------------------------------------------
+    chrono::duration<double> elapsed = finish - start;
+    cout << "Elapsed time: " << elapsed.count() << " s\n";
+
+    for(int i = 0; i < 5; i++){
+        if(elapsed.count() < bestTime[i]){
+            for(int j = i; j < 4; j++){
+                bestTime[i  + 1] = bestTime[i];
+            }
+            bestTime[i] = elapsed.count();
+            return;
+        }
+    }
+    ------------------------------------------------ */
+    ofstream writeFile("BestTime.txt");
+    if (writeFile.is_open()) {
+        int k = 0;
+        for (int i = 0; i < 5; i++) {
+            writeFile << timeArray[k] << " " << timeArray[k + 1] << "\n";
+            k += 2;
+        }
+        writeFile.close();
+    } else cout << "Unable to open file";
+}
+
 class server {
 private:
     int sockfd, newsockfd;
@@ -18,14 +53,14 @@ private:
     struct sockaddr_in serv_addr, cli_addr;
     int n;
     char buffer[256];
+    string nicknameClient;
     cGameManager *c;
 public:
     ~server() {
         delete c;
     }
 
-    void start(int width, int height, char nicknameServer) {
-        //c->setInitial(width, height, nicknameServer);
+    void start() {
         c->Run();
     }
 
@@ -79,7 +114,7 @@ public:
         }
     }
 
-    server(int argc, char *argv[], int width, int height, char nicknameServer) {
+    server(int argc, char *argv[], int width, int height, string nicknameServer) {
         if (argc < 2) {
             fprintf(stderr, "usage %s port\n", argv[0]);
             return;
@@ -110,58 +145,36 @@ public:
         bzero(buffer, 256);
         buffer[0] = width;
         buffer[1] = height;
-        buffer[2] = nicknameServer;
+        buffer[2] = nicknameServer.length();
+        for (int i = 0; i < nicknameServer.length(); i++) {
+            buffer[3 + i] = nicknameServer[i];
+        }
         n = write(newsockfd, buffer, strlen(buffer));
 
         if (n < 0) {
             perror("Error writing to socket");
             return;
         }
+        bzero(buffer, 256);
+
+        n = read(newsockfd, buffer, 255);
+        if (n < 0) {
+            perror("Error reading from socket");
+            return;
+        }
+
+        nicknameClient = buffer;
+        nicknameClient = nicknameClient.substr(1, (int)buffer[0]);
+
         c = new cGameManager(width, height);
+        c->setServerNickname(nicknameServer);
+        c->setClientNickname(nicknameClient);
         auto start = chrono::high_resolution_clock::now();
         thread threadReadWrite(&server::readWriteServer, this);
-        thread threadGame(&server::start, this, (int) buffer[0], (int) buffer[1], buffer[2]);
+        thread threadGame(&server::start, this);
         threadReadWrite.join();
         threadGame.join();
         close(newsockfd);
         close(sockfd);
-
-        /*string line;
-        int bestTime[5];
-        ifstream readFile ("BestTime.txt");
-        if (readFile.is_open())
-        {
-            for(int i = 0; i < 5; i++){
-                getline (readFile,line);
-                bestTime[i] << stoi(line);
-            }
-            readFile.close();
-        }
-
-        else cout << "Unable to open file";
-
-        auto finish = chrono::high_resolution_clock::now();
-        chrono::duration<double> elapsed = finish - start;
-        cout << "Elapsed time: " << elapsed.count() << " s\n";
-
-        for(int i = 0; i < 5; i++){
-            if(elapsed.count() < bestTime[i]){
-                for(int j = i; j < 4; j++){
-                    bestTime[i  + 1] = bestTime[i];
-                }
-                bestTime[i] = elapsed.count();
-                return;
-            }
-        }
-
-        ofstream writeFile ("BestTime.txt");
-        if (writeFile.is_open())
-        {
-            for(int i = 0; i < 5; i++){
-                writeFile << bestTime[i] << "\n";
-            }
-            writeFile.close();
-        }
-        else cout << "Unable to open file";*/
     }
 };

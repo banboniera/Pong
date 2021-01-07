@@ -15,37 +15,14 @@ private:
     struct sockaddr_in serv_addr;
     struct hostent *server;
     char buffer[256];
+    string nicknameServer, nicknameClient;
     cGameManager *c;
 public:
     ~client() {
         delete c;
     }
-    /*
-     * Funkcia prevzata z webu:
-     * https://stackoverflow.com/questions/421860/capture-characters-from-standard-input-without-waiting-for-enter-to-be-pressed
-     */
-    char mygetch() {
-        char buf = 0;
-        struct termios old = {0};
-        if (tcgetattr(0, &old) < 0)
-            perror("tcsetattr()");
-        old.c_lflag &= ~ICANON;
-        old.c_lflag &= ~ECHO;
-        old.c_cc[VMIN] = 1;
-        old.c_cc[VTIME] = 0;
-        if (tcsetattr(0, TCSANOW, &old) < 0)
-            perror("tcsetattr ICANON");
-        if (read(0, &buf, 1) < 0)
-            perror("read()");
-        old.c_lflag |= ICANON;
-        old.c_lflag |= ECHO;
-        if (tcsetattr(0, TCSADRAIN, &old) < 0)
-            perror("tcsetattr ~ICANON");
-        return (buf);
-    }
 
-    void start(int width, int height, char nicknameServer) {
-        //c->setInitial(width, height, nicknameServer);
+    void start() {
         c->player2Function();
     }
 
@@ -130,16 +107,29 @@ public:
             perror("Error connecting to socket");
             return;
         }
-        bzero(buffer, 2);
-        n = read(sockfd, buffer, 2);
-
+        bzero(buffer, 256);
+        n = read(sockfd, buffer, 255);
         if (n < 0) {
             perror("Error reading from socket");
             return;
         }
 
         c = new cGameManager((int) buffer[0], (int) buffer[1]);
-        thread threadGame(&client::start, this, (int) buffer[0], (int) buffer[1], buffer[2]);
+        nicknameServer = buffer;
+        nicknameServer = nicknameServer.substr(3, (int)buffer[2]);
+        c->setServerNickname(nicknameServer);
+        cout << "Enter nickname: \n";
+        cin >> nicknameClient;
+        if (nicknameClient == "") nicknameClient = "Player2";
+        c->setClientNickname(nicknameClient);
+
+        buffer[0] = nicknameClient.length();
+        for (int i = 0; i < nicknameClient.length(); i++) {
+            buffer[1 + i] = nicknameClient[i];
+        }
+        n = write(sockfd, buffer, strlen(buffer));
+
+        thread threadGame(&client::start, this);
         thread threadReadWrite(&client::readWriteServer, this);
         threadGame.join();
         threadReadWrite.join();
