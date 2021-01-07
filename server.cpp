@@ -11,41 +11,6 @@
 
 using namespace std;
 
-void writeTime() {
-    string timeArray[10];
-    ifstream readFile("BestTime.txt");
-    if (readFile.is_open()) {
-        for (int i = 0; i < 10; i++) {
-            readFile >> timeArray[i];
-        }
-        readFile.close();
-    } else cout << "Unable to open file";
-    auto finish = chrono::high_resolution_clock::now();
-    /* ------------------------------------------------
-    chrono::duration<double> elapsed = finish - start;
-    cout << "Elapsed time: " << elapsed.count() << " s\n";
-
-    for(int i = 0; i < 5; i++){
-        if(elapsed.count() < bestTime[i]){
-            for(int j = i; j < 4; j++){
-                bestTime[i  + 1] = bestTime[i];
-            }
-            bestTime[i] = elapsed.count();
-            return;
-        }
-    }
-    ------------------------------------------------ */
-    ofstream writeFile("BestTime.txt");
-    if (writeFile.is_open()) {
-        int k = 0;
-        for (int i = 0; i < 5; i++) {
-            writeFile << timeArray[k] << " " << timeArray[k + 1] << "\n";
-            k += 2;
-        }
-        writeFile.close();
-    } else cout << "Unable to open file";
-}
-
 class server {
 private:
     int sockfd, newsockfd;
@@ -114,6 +79,39 @@ public:
         }
     }
 
+    void writeTime(chrono::time_point<chrono::system_clock, chrono::duration<long, ratio<1, 1000000000>>> start) {
+        string timeArray[10];
+        ifstream readFile("BestTime.txt");
+        if (readFile.is_open()) {
+            for (int i = 0; i < 10; i++) {
+                readFile >> timeArray[i];
+            }
+            readFile.close();
+        } else cout << "Unable to open file";
+        auto finish = chrono::high_resolution_clock::now();
+        chrono::duration<double> elapsed = finish - start;
+        cout << "Elapsed time: " << elapsed.count() << " s\n";
+
+        for(int i = 1; i < 10; i+=2){
+            if(elapsed.count() < stoi(timeArray[i])){
+                for(int j = i; j < 10; j+=2){
+                    timeArray[j  + 2] = timeArray[i];
+                }
+                timeArray[i] = elapsed.count();
+                return;
+            }
+        }
+        ofstream writeFile("BestTime.txt");
+        if (writeFile.is_open()) {
+            int k = 0;
+            for (int i = 0; i < 5; i++) {
+                writeFile << timeArray[k] << " " << timeArray[k + 1] << "\n";
+                k += 2;
+            }
+            writeFile.close();
+        } else cout << "Unable to open file";
+    }
+
     server(int argc, char *argv[], int width, int height, string nicknameServer) {
         if (argc < 2) {
             fprintf(stderr, "usage %s port\n", argv[0]);
@@ -174,6 +172,7 @@ public:
         thread threadGame(&server::start, this);
         threadReadWrite.join();
         threadGame.join();
+        //writeTime(start);
         close(newsockfd);
         close(sockfd);
     }

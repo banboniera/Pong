@@ -1,18 +1,20 @@
 #include <sys/types.h>
+#include <fstream>
 #include "server.cpp"
 #include "client.cpp"
 
 void showBestTime() {
     string line;
-    ifstream readFile("BestTime.txt");
+    ifstream readFile("BestTime.txt", ifstream::in);
+    cout << "test" << "\n";
     if (readFile.is_open()) {
+        cout << "Best time: " << "\n";
         for (int i = 0; i < 5; i++) {
             getline(readFile, line);
-            cout << "Best time: " << "\n";
-            cout << i << ". " << stoi(line) << "\n";
+            cout << i << ". " << line << "\n";
         }
         readFile.close();
-    }
+    } else cout << "Unable to open file" << "\n";
 }
 
 int main(int argc, char *argv[]) {
@@ -51,7 +53,7 @@ int main(int argc, char *argv[]) {
             a = 0;
         }
         if (input == 'b') {
-            showBestTime();
+            //showBestTime();
         }
         if (input == 'q') {
             a = 0;
