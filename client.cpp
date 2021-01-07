@@ -5,13 +5,12 @@
 #include <thread>
 #include <iostream>
 #include <unistd.h>
-#include <termios.h>
 
 using namespace std;
 
 class client {
 private:
-    int sockfd, n;
+    int sockfd, n, maxScore;
     struct sockaddr_in serv_addr;
     struct hostent *server;
     char buffer[256];
@@ -36,7 +35,7 @@ public:
             buffer[0] = (int) buffer[0] + 1;
 
             if (c->getQuit()) {
-                cout << "ukoncili ste hru\n";
+                cout << "you closed the game\n";
                 buffer[1] = 1;
                 n = write(sockfd, buffer, strlen(buffer));
                 return;
@@ -55,7 +54,7 @@ public:
                 buffer[i] = (int) buffer[i] - 1;
             }
             if ((int) buffer[5] == 1) {
-                cout << "server ukoncil hru\n";
+                cout << "server closed the game\n";
                 c->setQuit(true);
                 return;
             } else if (n < 0) {
@@ -67,10 +66,11 @@ public:
                 }
                 c->player1SetPosition((int) buffer[0], (int) buffer[1], (int) buffer[2], (int) buffer[3],
                                       (int) buffer[4]);
-                if ((int) buffer[3] == 11 || (int) buffer[4] == 11) {
-                    cout << "hra skoncila, ";
-                    if ((int) buffer[3] == 11) cout << "hrac 1 vyhral so skore " << (int) buffer[3] << "\n";
-                    else cout << "hrac 2 vyhral so skore " << (int) buffer[4] << "\n";
+                if ((int) buffer[3] == maxScore || (int) buffer[4] == maxScore) {
+                    cout << "\n";
+                    cout << "game finished, ";
+                    if ((int) buffer[3] == maxScore) cout << nicknameServer << " won with score " << (int) buffer[3] << "." <<  nicknameClient  <<" lost with score " << (int) buffer[4] << "\n";
+                    else cout << nicknameClient << " won with score " << (int) buffer[4] << "." <<  nicknameServer  <<" lost with score " << (int) buffer[3] << "\n";
                     c->setQuit(true);
                     return;
                 }
@@ -114,9 +114,11 @@ public:
             return;
         }
 
+        this->maxScore = (int) buffer[2];
         c = new cGameManager((int) buffer[0], (int) buffer[1]);
+
         nicknameServer = buffer;
-        nicknameServer = nicknameServer.substr(3, (int)buffer[2]);
+        nicknameServer = nicknameServer.substr(4, (int)buffer[3]);
         c->setServerNickname(nicknameServer);
         cout << "Enter nickname: \n";
         cin >> nicknameClient;
@@ -128,6 +130,10 @@ public:
             buffer[1 + i] = nicknameClient[i];
         }
         n = write(sockfd, buffer, strlen(buffer));
+        if (n < 0) {
+            perror("Error writing to socket");
+            return;
+        }
 
         thread threadGame(&client::start, this);
         thread threadReadWrite(&client::readWriteServer, this);

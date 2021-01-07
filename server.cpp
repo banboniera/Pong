@@ -13,12 +13,11 @@ using namespace std;
 
 class server {
 private:
-    int sockfd, newsockfd;
+    int sockfd, newsockfd, n, maxScore;
     socklen_t cli_len;
     struct sockaddr_in serv_addr, cli_addr;
-    int n;
     char buffer[256];
-    string nicknameClient;
+    string nicknameClient, nicknameServer;
     cGameManager *c;
 public:
     ~server() {
@@ -37,7 +36,7 @@ public:
             n = read(newsockfd, buffer, 255);
 
             if ((int) buffer[1] == 1) {
-                cout << "klient ukoncil hru\n";
+                cout << "client ended the game\n";
                 c->setQuit(true);
                 return;
             } else if (n < 0) {
@@ -47,13 +46,6 @@ public:
             } else {
                 buffer[0] = (int) buffer[0] - 1;
                 c->player2SetPosition((int) buffer[0]);
-                if ((int) buffer[3] == 11 || (int) buffer[4] == 11) {
-                    cout << "hra skoncila, ";
-                    if ((int) buffer[3] == 11) cout << "hrac 1 vyhral so skore " << (int) buffer[3] << "\n";
-                    else cout << "hrac 2 vyhral so skore " << (int) buffer[4] << "\n";
-                    c->setQuit(true);
-                    return;
-                }
             }
             bzero(buffer, 256);
             //-------------- WRITE to client --------------
@@ -64,7 +56,7 @@ public:
                 buffer[i] = (int) buffer[i] + 1;
             }
             if (c->getQuit()) {
-                cout << "ukoncili ste hru\n";
+                cout << "you closed the game\n";
                 buffer[5] = 1;
                 n = write(newsockfd, buffer, strlen(buffer));
                 return;
@@ -75,7 +67,17 @@ public:
                 perror("Error writing to socket");
                 return;
             }
+            if ((int) buffer[3] - 1 == this->maxScore || (int) buffer[4] - 1 == this->maxScore) {
+                cout << "\n";
+                cout << "game finished, ";
+                if ((int) buffer[3] == maxScore) cout << nicknameServer << " won with score " << (int) buffer[3] << "." <<  nicknameClient  <<" lost with score " << (int) buffer[4] << "\n";
+                else cout << nicknameClient << " won with score " << (int) buffer[4] << "." <<  nicknameServer  <<" lost with score " << (int) buffer[3] << "\n";
+                c->setQuit(true);
+                return;
+            }
             bzero(buffer, 256);
+
+
         }
     }
 
@@ -112,7 +114,7 @@ public:
         } else cout << "Unable to open file";
     }
 
-    server(int argc, char *argv[], int width, int height, string nicknameServer) {
+    server(int argc, char *argv[], int width, int height, string nicknameServer, int maxScore) {
         if (argc < 2) {
             fprintf(stderr, "usage %s port\n", argv[0]);
             return;
@@ -140,12 +142,14 @@ public:
             return;
         }
         //write information about game
+        this->maxScore = maxScore;
         bzero(buffer, 256);
         buffer[0] = width;
         buffer[1] = height;
-        buffer[2] = nicknameServer.length();
+        buffer[2] = maxScore;
+        buffer[3] = nicknameServer.length();
         for (int i = 0; i < nicknameServer.length(); i++) {
-            buffer[3 + i] = nicknameServer[i];
+            buffer[4 + i] = nicknameServer[i];
         }
         n = write(newsockfd, buffer, strlen(buffer));
 
@@ -161,6 +165,7 @@ public:
             return;
         }
 
+        this->nicknameServer = nicknameServer;
         nicknameClient = buffer;
         nicknameClient = nicknameClient.substr(1, (int)buffer[0]);
 

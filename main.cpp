@@ -18,7 +18,7 @@ void showBestTime() {
 }
 
 int main(int argc, char *argv[]) {
-    int height, width, a = 1;
+    int height, width, maxScore, a = 1;
     char input;
     string nicknameServer;
     do {
@@ -39,13 +39,17 @@ int main(int argc, char *argv[]) {
             if (nicknameServer == "") {
                 nicknameServer = "Player1";
             }
-            cout << "Enter height (min 10): \n";
+            cout << "Enter height (min 10, default 20): \n";
             cin >> height;
             if (height < 10) height = 20;
-            cout << "Enter width (min 10): \n";
+            cout << "Enter width (min 10, default 40): \n";
             cin >> width;
             if (width < 10) width = 40;
-            server(argc, argv, width, height, nicknameServer);
+            cout << "Enter max score (min 1, default 11): \n";
+            cin >> maxScore;
+            if (maxScore < 1) width = 11;
+            cout << "Wait for client to connect\n";
+            server(argc, argv, width, height, nicknameServer, maxScore);
             a = 0;
         }
         if (input == 'c') {
