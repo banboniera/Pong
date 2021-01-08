@@ -1,21 +1,6 @@
 #include <sys/types.h>
-#include <fstream>
 #include "server.cpp"
 #include "client.cpp"
-
-void showBestTime() {
-    string line;
-    ifstream readFile("BestTime.txt", ifstream::in);
-    cout << "test" << "\n";
-    if (readFile.is_open()) {
-        cout << "Best time: " << "\n";
-        for (int i = 0; i < 5; i++) {
-            getline(readFile, line);
-            cout << i << ". " << line << "\n";
-        }
-        readFile.close();
-    } else cout << "Unable to open file" << "\n";
-}
 
 int main(int argc, char *argv[]) {
     int height, width, maxScore, a = 1;
@@ -29,11 +14,14 @@ int main(int argc, char *argv[]) {
             system("clear");
         }
         cout << "1. Choose server (s) or client (c) \n";
-        cout << "2. Show best time (b) \n";
         cout << "3. Quit game (q) \n";
         cin >> input;
         if (input == 's') {
             system("clear");
+            if (argc < 2) {
+                cout << "not enough arguments\n";
+                return 1;
+            }
             cout << "Enter nickname: \n";
             cin >> nicknameServer;
             if (nicknameServer == "") {
@@ -47,17 +35,18 @@ int main(int argc, char *argv[]) {
             if (width < 10) width = 40;
             cout << "Enter max score (min 1, default 11): \n";
             cin >> maxScore;
-            if (maxScore < 1) width = 11;
+            if (maxScore < 1) maxScore = 11;
             cout << "Wait for client to connect\n";
             server(argc, argv, width, height, nicknameServer, maxScore);
             a = 0;
         }
         if (input == 'c') {
+            if (argc < 3) {
+                cout << "not enough arguments\n";
+                return 1;
+            }
             client(argc, argv);
             a = 0;
-        }
-        if (input == 'b') {
-            //showBestTime();
         }
         if (input == 'q') {
             a = 0;

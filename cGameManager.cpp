@@ -24,6 +24,7 @@ private:
     mutex mut;
     mutex mutBall;
 public:
+    //parametricky konstruktor
     cGameManager(int w, int h) {
         srand(time(NULL));
         quit = false;
@@ -36,7 +37,7 @@ public:
         player1 = new cPaddle(1, h / 2 - 3);
         player2 = new cPaddle(w - 2, h / 2 - 3);
     }
-
+    //destruktor
     ~cGameManager() {
         delete this->ball;
         delete this->player1;
@@ -46,6 +47,7 @@ public:
     /*
      * Funkcia prevzata z webu:
      * https://stackoverflow.com/questions/421860/capture-characters-from-standard-input-without-waiting-for-enter-to-be-pressed
+     * nacitava stlacene tlacitka po jednom
      */
     char mygetch() {
         char buf = 0;
@@ -73,6 +75,7 @@ public:
     /*
      * Funkcia prevzata z webu:
      * https://stackoverflow.com/questions/29335758/using-kbhit-and-getch-on-linux
+     * kontroluje, ci je nejake tlacitko stlacene
      */
     bool kbhit() {
         termios term;
@@ -85,7 +88,7 @@ public:
         tcsetattr(0, TCSANOW, &term);
         return byteswaiting > 0;
     }
-
+    //prida score a zresetuje poziciu hernich prvkov
     void ScoreUp(cPaddle *player) {
         if (player == player1)
             score1++;
@@ -94,7 +97,7 @@ public:
         ball->Reset();
         player1->Reset();
     }
-
+    //vykresli herne pole
     void Draw() {
         system("clear");
 
@@ -145,7 +148,7 @@ public:
         cout << "1. " << nicknameServer << ": " << score1 << endl
              << "2. " << nicknameClient << ": " << score2 << endl;
     }
-
+    //spravanie hry (hlavne lopty)
     void Logic() {
         int ballx = ball->getX();
         int bally = ball->getY();
@@ -155,14 +158,24 @@ public:
         int player2y = player2->getY();
         //left paddle
         for (int i = 0; i < 4; i++)
-            if (ballx == player1x + 1)
+            if (ballx == player1x + 1) {
                 if (bally == player1y + i)
                     ball->changeDirection((eDir) ((rand() % 3) + 4));
+                else if (ball->getDirection() == DOWNLEFT && bally == player1y - 1)
+                    ball->changeDirection(UPRIGHT);
+                else if (ball->getDirection() == UPLEFT && bally == player1y + 4)
+                    ball->changeDirection(DOWNRIGHT);
+            }
         //right paddle
         for (int i = 0; i < 4; i++)
-            if (ballx == player2x - 1)
+            if (ballx == player2x - 1) {
                 if (bally == player2y + i)
                     ball->changeDirection((eDir) ((rand() % 3) + 1));
+                else if (ball->getDirection() == DOWNRIGHT && bally == player2y - 1)
+                    ball->changeDirection(UPLEFT);
+                else if (ball->getDirection() == UPRIGHT && bally == player2y + 4)
+                    ball->changeDirection(DOWNLEFT);
+            }
         //bottom wall
         if (bally == height - 1)
             ball->changeDirection(ball->getDirection() == DOWNRIGHT ? UPRIGHT : UPLEFT);
@@ -176,48 +189,21 @@ public:
         if (ballx == 0)
             ScoreUp(player2);
     }
-
+    //nastavy herne elementy od hraca 1
     void player1SetPosition(int player1Y, int ballX, int ballY, int score1, int score2) {
-        mut.lock();
         this->player1->setY(player1Y);
-        mut.unlock();
-        mutBall.lock();
         this->ball->setX(ballX);
         this->ball->setY(ballY);
-        mutBall.unlock();
         this->score1 = score1;
         this->score2 = score2;
         Draw();
     }
-
+    //nastavy herne elementy od hraca 2
     void player2SetPosition(int posY) {
         this->player2->setY(posY);
         Draw();
     }
-
-    void player1Function() {
-        //Draw();
-        while (quit == false) {
-            if (kbhit()) {
-                mut.lock();
-                char current = mygetch();
-                if (current == up)
-                    if (player1->getY() > 0) {
-                        player1->moveUp();
-                        //Draw();
-                    }
-                if (current == down)
-                    if (player1->getY() + 4 < height) {
-                        player1->moveDown();
-                        //Draw();
-                    }
-                if (current == 'q')
-                    quit = true;
-                mut.unlock();
-            }
-        }
-    }
-
+    //nastavy parametre od hraca 1 do buffera
     void player1GetParams(char *buffer) {
         mut.lock();
         buffer[0] = player1->getY();
@@ -229,19 +215,49 @@ public:
         buffer[3] = score1;
         buffer[4] = score2;
     }
-
+    //nastavy parametre od hraca 2 do buffera
     void player2GetParams(char *buffer) {
         mut.lock();
         buffer[0] = player2->getY();
         mut.unlock();
     }
-
+    //metoda ohladajuca prave padlo
+    void player1Function() {
+        //Draw();
+        while (quit == false) {
+            //skontroluje, ci je stlacene nejake tlacitko
+            if (kbhit()) {
+                mut.lock();
+                //nacita stlacene tlacitko
+                char current = mygetch();
+                //skontroluje ci stlacene tlacitko ma posunut padlo a tak ho posunie
+                if (current == up)
+                    if (player1->getY() > 0) {
+                        player1->moveUp();
+                        //Draw();
+                    }
+                if (current == down)
+                    if (player1->getY() + 4 < height) {
+                        player1->moveDown();
+                        //Draw();
+                    }
+                //skontroluje, ci hrac ukoncil hru stlacenim q
+                if (current == 'q')
+                    quit = true;
+                mut.unlock();
+            }
+        }
+    }
+    //metoda ohladajuca prave padlo
     void player2Function() {
         //Draw();
         while (quit == false) {
+            //skontroluje, ci je stlacene nejake tlacitko
             if (kbhit()) {
                 mut.lock();
+                //nacita stlacene tlacitko
                 char current = mygetch();
+                //skontroluje ci stlacene tlacitko ma posunut padlo a tak ho posunie
                 if (current == up)
                     if (player2->getY() > 0) {
                         player2->moveUp();
@@ -252,13 +268,28 @@ public:
                         player2->moveDown();
                         //Draw();
                     }
+                //skontroluje, ci hrac ukoncil hru stlacenim q
                 if (current == 'q')
                     quit = true;
                 mut.unlock();
             }
         }
     }
-
+    //metoda ohladajuca loptu
+    void ballFunction() {
+        while (quit == false) {
+            mutBall.lock();
+            //skontroluje spravanie lopty podla jej pozicie od hracov a stien
+            Logic();
+            //posunie loptu
+            ball->Move();
+            //zacne pohyb lopty
+            if (ball->getDirection() == STOP)
+                ball->randomDirection();
+            mutBall.unlock();
+            this_thread::sleep_for(0.2s);
+        }
+    }
     bool getQuit() {
         return this->quit;
     }
@@ -266,20 +297,6 @@ public:
     void setQuit(bool quit) {
         this->quit = quit;
     }
-
-    void ballFunction() {
-        while (quit == false) {
-            mutBall.lock();
-            ball->Move();
-            //Draw();
-            if (ball->getDirection() == STOP)
-                ball->randomDirection();
-            Logic();
-            mutBall.unlock();
-            this_thread::sleep_for(0.2s);
-        }
-    }
-
     void setServerNickname(string nicknameServer) {
         this->nicknameServer = nicknameServer;
     }
@@ -295,14 +312,14 @@ public:
     int getScore2() {
         return this->score2;
     }
-
+    //zresetuje poziciu hraca 2
     void resetPlayer2() {
         return player2->Reset();
     }
-
+    //zapne vlakna
     void Run() {
-        thread threadPlayer1(&cGameManager::player1Function, this/*, &mut, &cvPlayer, &cvBall*/);
-        thread threadBall(&cGameManager::ballFunction, this/*, &mut, &cvPlayer, &cvBall*/);
+        thread threadPlayer1(&cGameManager::player1Function, this);
+        thread threadBall(&cGameManager::ballFunction, this);
         threadPlayer1.join();
         threadBall.join();
     }
