@@ -1,22 +1,42 @@
 #include <sys/types.h>
 #include "server.cpp"
 #include "client.cpp"
+#include <string.h>
+#include <vector>
+#include <fstream>
 
 void showBestTime() {
     string line;
-    ifstream readFile("BestTime.txt");
+    ifstream readFile("BestTime.txt", ifstream::in);
+    cout << "test" << "\n";
     if (readFile.is_open()) {
+        cout << "Best time: " << "\n";
         for (int i = 0; i < 5; i++) {
             getline(readFile, line);
-            cout << "Best time: " << "\n";
-            cout << i << ". " << stoi(line) << "\n";
+            cout << i << ". " << line << "\n";
         }
         readFile.close();
-    }
+    } else cout << "Unable to open file" << "\n";
 }
 
 int main(int argc, char *argv[]) {
-    int height, width, a = 1;
+    std::string input;
+    std::vector<std::string> names;
+    std::fstream readFile("time.txt", fstream::in);
+    getline(readFile, input);
+    cout << input << "\n";
+    cout << "test1" << "\n";
+    while (readFile >> input) {
+        cout << "test3" << "\n";
+        names.push_back(input);
+        cout << input << "\n";
+    }
+    cout << "test2" << "\n";
+    return 0;
+
+
+    /*
+    int height, width, maxScore, a = 1;
     char input;
     string nicknameServer;
     do {
@@ -35,15 +55,19 @@ int main(int argc, char *argv[]) {
             cout << "Enter nickname: \n";
             cin >> nicknameServer;
             if (nicknameServer == "") {
-                nicknameServer = 'Player1';
+                nicknameServer = "Player1";
             }
-            cout << "Enter height (min 10): \n";
+            cout << "Enter height (min 10, default 20): \n";
             cin >> height;
             if (height < 10) height = 20;
-            cout << "Enter width (min 10): \n";
+            cout << "Enter width (min 10, default 40): \n";
             cin >> width;
             if (width < 10) width = 40;
-            server(argc, argv, width, height, nicknameServer);
+            cout << "Enter max score (min 1, default 11): \n";
+            cin >> maxScore;
+            if (maxScore < 1) width = 11;
+            cout << "Wait for client to connect\n";
+            server(argc, argv, width, height, nicknameServer, maxScore);
             a = 0;
         }
         if (input == 'c') {
@@ -51,10 +75,11 @@ int main(int argc, char *argv[]) {
             a = 0;
         }
         if (input == 'b') {
-            showBestTime();
+            //showBestTime();
         }
         if (input == 'q') {
             a = 0;
         }
     } while (a > 0);
+     */
 }

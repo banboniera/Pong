@@ -15,7 +15,7 @@ class cGameManager {
 private:
     int width, height;
     int score1, score2;
-    char up1, down1, up2, down2;
+    char up, down;
     string nicknameServer, nicknameClient;
     bool quit;
     cBall *ball;
@@ -23,16 +23,12 @@ private:
     cPaddle *player2;
     mutex mut;
     mutex mutBall;
-    condition_variable cvBall;
-    condition_variable cvPlayer;
 public:
     cGameManager(int w, int h) {
         srand(time(NULL));
         quit = false;
-        up1 = 'w';
-        up2 = 'i';
-        down1 = 's';
-        down2 = 'k';
+        up = 'w';
+        down = 's';
         score1 = score2 = 0;
         width = w;
         height = h;
@@ -191,28 +187,26 @@ public:
         mutBall.unlock();
         this->score1 = score1;
         this->score2 = score2;
-        //Draw();
+        Draw();
     }
 
     void player2SetPosition(int posY) {
         this->player2->setY(posY);
-        //Draw();
+        Draw();
     }
 
-    void player1Function(/*mutex *mut, condition_variable *cvPlayer, condition_variable *cvBall*/) {
+    void player1Function() {
         //Draw();
         while (quit == false) {
-            //(*cvBall).notify_one();
-            //(*cvPlayer).wait(lock);
             if (kbhit()) {
                 mut.lock();
                 char current = mygetch();
-                if (current == up1)
+                if (current == up)
                     if (player1->getY() > 0) {
                         player1->moveUp();
                         //Draw();
                     }
-                if (current == down1)
+                if (current == down)
                     if (player1->getY() + 4 < height) {
                         player1->moveDown();
                         //Draw();
@@ -242,21 +236,18 @@ public:
         mut.unlock();
     }
 
-    void player2Function(/*mutex *mut, condition_variable *cvPlayer, condition_variable *cvBall*/) {
+    void player2Function() {
         //Draw();
-        //unique_lock<mutex> lock(*mut);
         while (quit == false) {
-            //(*cvBall).notify_one();
-            //(*cvPlayer).wait(lock);
             if (kbhit()) {
                 mut.lock();
                 char current = mygetch();
-                if (current == up2)
+                if (current == up)
                     if (player2->getY() > 0) {
                         player2->moveUp();
                         //Draw();
                     }
-                if (current == down2)
+                if (current == down)
                     if (player2->getY() + 4 < height) {
                         player2->moveDown();
                         //Draw();
@@ -276,18 +267,15 @@ public:
         this->quit = quit;
     }
 
-    void ballFunction(/*mutex *mut, condition_variable *cvPlayer, condition_variable *cvBall*/) {
-        //unique_lock<mutex> lock(*mut);
+    void ballFunction() {
         while (quit == false) {
-            //(*cvPlayer).notify_all();
             mutBall.lock();
             ball->Move();
             //Draw();
-            mutBall.unlock();
-            //(*cvBall).wait(lock);
             if (ball->getDirection() == STOP)
                 ball->randomDirection();
             Logic();
+            mutBall.unlock();
             this_thread::sleep_for(0.2s);
         }
     }
