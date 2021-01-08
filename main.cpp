@@ -3,6 +3,7 @@
 #include "client.cpp"
 
 int main(int argc, char *argv[]) {
+
     int height, width, maxScore, a = 1;
     char input;
     string nicknameServer;
@@ -35,11 +36,13 @@ int main(int argc, char *argv[]) {
             if (width < 10) width = 40;
             cout << "Enter max score (min 1, default 11): \n";
             cin >> maxScore;
+          
             if (maxScore < 1) maxScore = 11;
             cout << "Wait for client to connect\n";
             server(argc, argv, width, height, nicknameServer, maxScore);
             a = 0;
         }
+      
         if (input == 'c') {
             if (argc < 3) {
                 cout << "not enough arguments\n";
@@ -48,6 +51,7 @@ int main(int argc, char *argv[]) {
             client(argc, argv);
             a = 0;
         }
+      
         if (input == 'q') {
             a = 0;
         }

@@ -43,7 +43,6 @@ public:
         delete this->player1;
         delete this->player2;
     }
-
     /*
      * Funkcia prevzata z webu:
      * https://stackoverflow.com/questions/421860/capture-characters-from-standard-input-without-waiting-for-enter-to-be-pressed
@@ -71,7 +70,6 @@ public:
             perror("tcsetattr ~ICANON");
         return (buf);
     }
-
     /*
      * Funkcia prevzata z webu:
      * https://stackoverflow.com/questions/29335758/using-kbhit-and-getch-on-linux
@@ -141,7 +139,6 @@ public:
             }
             cout << endl;
         }
-
         for (int i = 0; i < width + 2; i++)
             cout << "\xB2";
         cout << endl;
@@ -268,7 +265,7 @@ public:
                         player2->moveDown();
                         //Draw();
                     }
-                //skontroluje, ci hrac ukoncil hru stlacenim q
+                //skontroluje, ci hrac ukoncil hru stlacenim 
                 if (current == 'q')
                     quit = true;
                 mut.unlock();
@@ -290,6 +287,7 @@ public:
             this_thread::sleep_for(0.2s);
         }
     }
+  
     bool getQuit() {
         return this->quit;
     }

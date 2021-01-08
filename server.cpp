@@ -30,6 +30,7 @@ public:
     void readWriteServer() {
         while (true) {
             //-------------- READ from client --------------
+          
             //nacita informacie od klienta
             n = read(newsockfd, buffer, 255);
             //skontroluje ci klient ukoncil hru alebo nastala chyba pri citani
@@ -50,6 +51,7 @@ public:
             }
             bzero(buffer, 256);
             //-------------- WRITE to client --------------
+          
             this_thread::sleep_for(0.03s);
             //ziska data zo svojej hry
             c->player1GetParams(buffer);
@@ -122,6 +124,7 @@ public:
         buffer[1] = height;
         buffer[2] = maxScore;
         buffer[3] = nicknameServer.length();
+      
         for (int i = 0; i < nicknameServer.length(); i++) {
             buffer[4 + i] = nicknameServer[i];
         }

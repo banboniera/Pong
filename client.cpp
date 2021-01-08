@@ -28,6 +28,7 @@ public:
     void readWriteServer() {
         while (true) {
             //-------------- WRITE to server --------------
+          
             //nacita svoje informacie do bufferu
             bzero(buffer, 256);
             this_thread::sleep_for(0.03s);
@@ -50,6 +51,7 @@ public:
                 return;
             }
             //-------------- READ from server --------------
+          
             //nacita informacie od servera
             bzero(buffer, 256);
             n = read(sockfd, buffer, 255);
@@ -75,6 +77,7 @@ public:
                 c->player1SetPosition((int) buffer[0], (int) buffer[1], (int) buffer[2], (int) buffer[3],
                                       (int) buffer[4]);
                 //skontroluje, ci nejaky hrac nevyhral, ak ano, vypise kto a ukonci sa
+
                 if ((int) buffer[3] == maxScore || (int) buffer[4] == maxScore) {
                     cout << "\n";
                     cout << "game finished, ";
@@ -121,6 +124,7 @@ public:
         }
         bzero(buffer, 256);
         n = read(sockfd, buffer, 255);
+      
         if (n < 0) {
             perror("Error reading from socket");
             return;
@@ -135,14 +139,17 @@ public:
         c->setServerNickname(nicknameServer);
         cout << "Enter nickname: \n";
         cin >> nicknameClient;
+      
         if (nicknameClient == "") nicknameClient = "Player2";
         c->setClientNickname(nicknameClient);
         //posle svoj nickname serveru
         buffer[0] = nicknameClient.length();
+      
         for (int i = 0; i < nicknameClient.length(); i++) {
             buffer[1 + i] = nicknameClient[i];
         }
         n = write(sockfd, buffer, strlen(buffer));
+      
         if (n < 0) {
             perror("Error writing to socket");
             return;
